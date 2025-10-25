@@ -1,5 +1,6 @@
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -7,9 +8,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("button.fxml"));
-        Scene scene = new Scene(loader.load(), 800, 600);  
+        Parent root = FXMLLoader.load(getClass().getResource("button.fxml"));
+        Scene scene = new Scene(root);
+ 
 
         String css = this.getClass().getResource("style.css").toExternalForm();
         scene.getStylesheets().add(css);
@@ -19,6 +20,8 @@ public class App extends Application {
         
         
         stage.setScene(scene);
+        stage.setFullScreen(true);
+        stage.setFullScreenExitHint("");
         stage.show();
     }
 

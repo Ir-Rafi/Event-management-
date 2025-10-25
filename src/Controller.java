@@ -63,9 +63,9 @@ public class Controller {
         leftpane1.setManaged(true); rightpane1.setManaged(true);
 
         TranslateTransition slideLeft = new TranslateTransition(Duration.seconds(0.5), leftpane1);
-        slideLeft.setToX(-800);
+        slideLeft.setToX(-1530);
         TranslateTransition slideRight = new TranslateTransition(Duration.seconds(0.5), rightpane1);
-        slideRight.setToX(800);
+        slideRight.setToX(1530);
 
         slideLeft.play();
         slideRight.play();
@@ -81,9 +81,9 @@ public class Controller {
         leftpane1.setTranslateX(0); rightpane1.setTranslateX(0);
 
         TranslateTransition slideLeft = new TranslateTransition(Duration.seconds(0.5), leftpane);
-        slideLeft.setFromX(400); slideLeft.setToX(0);
+        slideLeft.setFromX(765); slideLeft.setToX(0);
         TranslateTransition slideRight = new TranslateTransition(Duration.seconds(0.5), rightpane);
-        slideRight.setFromX(-400); slideRight.setToX(0);
+        slideRight.setFromX(-765); slideRight.setToX(0);
 
         slideLeft.play();
         slideRight.play();
