@@ -10,18 +10,11 @@
         },
         {
             "type": "java",
-            "name": "Main",
-            "request": "launch",
-            "mainClass": "Main",
-            "projectName": "EventCreation_10eace1f"
-        },
-        {
-            "type": "java",
-            "name": "App (JavaFX)",
+            "name": "Run JavaFX App",
             "request": "launch",
             "mainClass": "App",
             "projectName": "EventCreation_10eace1f",
-            "vmArgs": "--module-path /Users/macbookair/Downloads/javafx-sdk-24.0.2/lib --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path /home/sajid/Downloads/javafx-sdk-25/lib --add-modules javafx.controls,javafx.fxml"
         }
     ]
 }
