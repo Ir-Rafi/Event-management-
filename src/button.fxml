@@ -338,22 +338,32 @@
                   <Font name="SansSerif Bold Italic" size="24.0" />
                </font>
             </Label>
-            <TextField fx:id="forgotUser" alignment="CENTER" layoutX="111.0" layoutY="364.0" prefHeight="68.0" prefWidth="565.0" promptText="Username" style="-fx-background-color: transparent; -fx-border-width: 0 0 2 0; -fx-border-color: transparent transparent #1f3ccc transparent; -fx-text-fill: #1f3ccc;">
+            <TextField fx:id="forgotUser" alignment="CENTER" layoutX="110.0" layoutY="318.0" prefHeight="68.0" prefWidth="565.0" promptText="Username" style="-fx-background-color: transparent; -fx-border-width: 0 0 2 0; -fx-border-color: transparent transparent #1f3ccc transparent; -fx-text-fill: #1f3ccc;">
                <font>
                   <Font name="SansSerif Regular" size="36.0" />
                </font>
             </TextField>
-            <Label fx:id="passError1" layoutX="110.0" layoutY="282.0" prefHeight="50.0" prefWidth="566.0" textFill="RED">
+            <Label fx:id="passMismatch" layoutX="106.0" layoutY="536.0" prefHeight="50.0" prefWidth="566.0" textFill="RED">
                <font>
                   <Font name="SansSerif Bold Italic" size="24.0" />
                </font>
             </Label>
-            <PasswordField fx:id="forgotPass" alignment="CENTER" layoutX="105.0" layoutY="514.0" prefHeight="68.0" prefWidth="567.0" promptText="New Password" style="-fx-background-color: transparent; -fx-text-fill: #1f3ccc; -fx-border-width: 0 0 2 0; -fx-border-color: transparent transparent #1f3ccc transparent;">
+            <PasswordField fx:id="forgotPass" alignment="CENTER" layoutX="108.0" layoutY="443.0" prefHeight="68.0" prefWidth="567.0" promptText="New Password" style="-fx-background-color: transparent; -fx-text-fill: #1f3ccc; -fx-border-width: 0 0 2 0; -fx-border-color: transparent transparent #1f3ccc transparent;">
                <font>
                   <Font name="SansSerif Regular" size="36.0" />
                </font>
             </PasswordField>
-            <Button fx:id="changePass" alignment="CENTER" layoutX="280.0" layoutY="689.0" mnemonicParsing="false" text="Change" textFill="WHITE">
+            <Button fx:id="changePass" alignment="CENTER" layoutX="185.0" layoutY="732.0" mnemonicParsing="false" text="Change" textFill="WHITE">
+               <font>
+                  <Font name="SansSerif Bold" size="36.0" />
+               </font>
+            </Button>
+            <PasswordField fx:id="ConfiirmPass" alignment="CENTER" layoutX="109.0" layoutY="579.0" prefHeight="68.0" prefWidth="567.0" promptText="Confirm New Password" style="-fx-background-color: transparent; -fx-text-fill: #1f3ccc; -fx-border-width: 0 0 2 0; -fx-border-color: transparent transparent #1f3ccc transparent;">
+               <font>
+                  <Font name="SansSerif Regular" size="36.0" />
+               </font>
+            </PasswordField>
+            <Button fx:id="Goback" alignment="CENTER" layoutX="445.0" layoutY="732.0" prefHeight="66.0" prefWidth="174.0" mnemonicParsing="false" text="Back" textFill="WHITE">
                <font>
                   <Font name="SansSerif Bold" size="36.0" />
                </font>

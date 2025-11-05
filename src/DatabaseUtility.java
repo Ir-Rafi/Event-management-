@@ -7,8 +7,8 @@ import java.util.Properties;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class DatabaseUtility {
-    private static final String URL = "jdbc:mysql://localhost:3306/db";
-    private static final String USER = "root";  // Replace with your MySQL username
+    private static final String URL = "jdbc:mysql://ununqd8usvy0wouy:GmDEehgTBjzyuPRuA8i8@b1gtvncwynmgz6qozokc-mysql.services.clever-cloud.com:3306/b1gtvncwynmgz6qozokc";
+    private static final String USER = "ununqd8usvy0wouy";  // Replace with your MySQL username
     
 
     
@@ -71,7 +71,21 @@ public static boolean userExists(String username) {
     return false;
 }
 
-private static final String PASSWORD  = "iambasic";  // Replace with your MySQL password
+    // Check if an email already exists in the DB
+    public static boolean emailExists(String email) {
+        String query = "SELECT 1 FROM users WHERE email = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+private static final String PASSWORD  = "GmDEehgTBjzyuPRuA8i8";  // Replace with your MySQL password
 
 // Update password for a user
 public static boolean updatePassword(String username, String newPassword) {

@@ -1,5 +1,7 @@
 
 
+
+
 import javafx.animation.Interpolator;
 
 import javafx.animation.TranslateTransition;
@@ -48,6 +50,10 @@ public class Controller {
     @FXML private Button changePass;
     @FXML private PasswordField forgotPass;
     @FXML private TextField forgotUser;
+    @FXML private Button Goback;               // the Back button in forgotPane
+    @FXML private PasswordField ConfiirmPass;  // Confirm Password field
+    @FXML private Label passMismatch;          // error label for mismatch
+
 
     @FXML
     public void initialize() {
@@ -80,6 +86,8 @@ public class Controller {
 
         forgotPassBtn.setOnAction(e -> showForgotPane());
         changePass.setOnAction(e -> handleChangePassword());
+        Goback.setOnAction(e -> hideForgotPane());
+
 
 
         
@@ -176,14 +184,25 @@ public class Controller {
         if (!agreed) { termsError.setText("You must agree to the terms"); hasError = true; }
 
         if (!hasError) {
-        // Register user in the database
-        if (DatabaseUtility.registerUser(username, email, password)) {
-             showAlert(Alert.AlertType.INFORMATION, "Registration Success", "Welcome, " + username + "!");
-            slideToLogin();  // After successful registration, switch to the login screen
-        } else {
-            showAlert(Alert.AlertType.ERROR, "Registration Failed", "Username or email may already be taken.");
+            // Check availability before attempting to register so we can show specific errors
+            if (DatabaseUtility.userExists(username)) {
+                userRegError.setText("Username already taken");
+                return;
+            }
+            if (DatabaseUtility.emailExists(email)) {
+                emailRegError.setText("Email already registered");
+                return;
+            }
+
+            // Register user in the database
+            if (DatabaseUtility.registerUser(username, email, password)) {
+                showAlert(Alert.AlertType.INFORMATION, "Registration Success", "Welcome, " + username + "!");
+                slideToLogin();  // After successful registration, switch to the login screen
+            } else {
+                // If we get here, registerUser failed for another reason (DB error, connectivity, etc.)
+                showAlert(Alert.AlertType.ERROR, "Registration Failed", "Failed to register. Check application console for details.");
+            }
         }
-    }
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
@@ -213,11 +232,19 @@ private void hideForgotPane() {
 private void handleChangePassword() {
     String username = forgotUser.getText();
     String newPassword = forgotPass.getText();
+    String confirmPassword = ConfiirmPass.getText();
 
-    
+    // Clear previous error
+    passMismatch.setText("");
 
-    if (username.isEmpty() || newPassword.isEmpty()) {
+    if (username.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
         showAlert(Alert.AlertType.ERROR, "Error", "Please fill in all fields.");
+        return;
+    }
+
+    // Check if passwords match
+    if (!newPassword.equals(confirmPassword)) {
+        passMismatch.setText("Passwords do not match!");
         return;
     }
 
@@ -231,10 +258,13 @@ private void handleChangePassword() {
         hideForgotPane();     // slide it back down
         forgotUser.clear();
         forgotPass.clear();
+        ConfiirmPass.clear();
+        passMismatch.setText("");
     } else {
         showAlert(Alert.AlertType.ERROR, "Error", "Failed to update password.");
     }
 }
+
 
 
 }
