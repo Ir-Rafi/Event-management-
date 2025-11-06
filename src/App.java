@@ -13,9 +13,8 @@ import javafx.animation.FadeTransition;
 import javafx.util.Duration;
 
 public class App extends Application {
-
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage){
         stage.setTitle("Event Management App");
 
         // --- HOME SCREEN ---
@@ -64,11 +63,30 @@ public class App extends Application {
             eventsLayout.add(card, i % 3, i / 3);
         }
 
+        // Top bar with back button and create new event button
+        HBox topBar = new HBox(20);
+        topBar.setAlignment(Pos.CENTER_LEFT);
+        topBar.setPadding(new Insets(0, 0, 10, 0));
+        
         Button backButton = new Button("← Back");
         backButton.setFont(Font.font("Poppins", 14));
-        backButton.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 10;");
+        backButton.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 8 20 8 20;");
         backButton.setOnAction(e -> stage.setScene(homeScene));
-        eventRoot.getChildren().add(0, backButton);
+        backButton.setOnMouseEntered(e -> backButton.setStyle("-fx-background-color: #1B4F72; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 8 20 8 20;"));
+        backButton.setOnMouseExited(e -> backButton.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 8 20 8 20;"));
+        
+        // Create New Event Button
+        Button createEventButton = new Button("+ Create New Event");
+        createEventButton.setFont(Font.font("Poppins", FontWeight.BOLD, 14));
+        createEventButton.setStyle("-fx-background-color: #27AE60; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 8 20 8 20;");
+        createEventButton.setOnMouseEntered(e -> createEventButton.setStyle("-fx-background-color: #1E8449; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 8 20 8 20;"));
+        createEventButton.setOnMouseExited(e -> createEventButton.setStyle("-fx-background-color: #27AE60; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 8 20 8 20;"));
+        createEventButton.setOnAction(e -> {
+            EventController.openEventForm(stage);
+        });
+        
+        topBar.getChildren().addAll(backButton, createEventButton);
+        eventRoot.getChildren().add(0, topBar);
 
         // Transition effect
         eventsButton.setOnAction(e -> {
