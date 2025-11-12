@@ -27,8 +27,16 @@ public class MainOrganizerView {
 
         backBtn.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 10;");
 
-        assignRolesBtn.setOnAction(e -> showAlert("Assign Roles", "You can assign roles to your team members here."));
-        todoBtn.setOnAction(e -> showAlert("To-Do", "You can create your task list here."));
+        assignRolesBtn.setOnAction(e -> {
+            AssignRolesWindow assignWindow = new AssignRolesWindow();
+            assignWindow.show();
+        });
+
+        todoBtn.setOnAction(e -> {
+            AdvancedTodoListApp todoApp = new AdvancedTodoListApp(stage.getScene());
+            todoApp.start(stage);
+        });
+
         bookPlacesBtn.setOnAction(e -> showAlert("Booking", "You can book venues for your event."));
         progressReportBtn.setOnAction(e -> {
             ProgressReportWindow reportWindow = new ProgressReportWindow();
