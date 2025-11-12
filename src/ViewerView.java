@@ -114,23 +114,38 @@ public class ViewerView {
         Label location = new Label("📍 " + event.location);
         location.setStyle("-fx-text-fill: #EAEAEA; -fx-font-size: 13px;");
 
-        // Organizers
-        VBox organizersBox = new VBox(4);
-        Label orgTitle = new Label("👥 Organizers:");
-        orgTitle.setStyle("-fx-text-fill: #F1C40F; -fx-font-weight: bold; -fx-font-size: 13px;");
-        organizersBox.getChildren().add(orgTitle);
+       // Organizers (main + sub)
+VBox organizersBox = new VBox(5);
+Label orgTitle = new Label("👥 Organizers:");
+orgTitle.setStyle("-fx-text-fill: #F1C40F; -fx-font-weight: bold; -fx-font-size: 13px;");
+organizersBox.getChildren().add(orgTitle);
 
-        if (event.organizers != null && !event.organizers.isEmpty()) {
-            for (EventController.Organizer org : event.organizers) {
-                Label orgLabel = new Label("• " + org.name + " (ID: " + org.registrationCode + ")");
-                orgLabel.setStyle("-fx-text-fill: #EAEAEA; -fx-font-size: 12px;");
-                organizersBox.getChildren().add(orgLabel);
-            }
-        } else {
-            Label noOrg = new Label("No organizers added");
-            noOrg.setStyle("-fx-text-fill: #AAAAAA; -fx-font-size: 12px; -fx-font-style: italic;");
-            organizersBox.getChildren().add(noOrg);
+if (event.organizers != null && !event.organizers.isEmpty()) {
+    // Main organizer = first one in list (added from session)
+    EventController.Organizer mainOrg = event.organizers.get(0);
+    Label mainOrgLabel = new Label("⭐ Main: " + mainOrg.name + " (ID: " + mainOrg.registrationCode + ")");
+    mainOrgLabel.setStyle("-fx-text-fill: #00FFAA; -fx-font-size: 12.5px; -fx-font-weight: bold;");
+    organizersBox.getChildren().add(mainOrgLabel);
+
+    // Sub-organizers (if any)
+    if (event.organizers.size() > 1) {
+        Label subTitle = new Label("— Sub Organizers —");
+        subTitle.setStyle("-fx-text-fill: #EAEAEA; -fx-font-size: 12px; -fx-font-style: italic;");
+        organizersBox.getChildren().add(subTitle);
+
+        for (int i = 1; i < event.organizers.size(); i++) {
+            EventController.Organizer sub = event.organizers.get(i);
+            Label subLabel = new Label("• " + sub.name + " (ID: " + sub.registrationCode + ")");
+            subLabel.setStyle("-fx-text-fill: #CCCCCC; -fx-font-size: 12px;");
+            organizersBox.getChildren().add(subLabel);
         }
+    }
+} else {
+    Label noOrg = new Label("No organizers found");
+    noOrg.setStyle("-fx-text-fill: #AAAAAA; -fx-font-size: 12px; -fx-font-style: italic;");
+    organizersBox.getChildren().add(noOrg);
+}
+
 
         card.getChildren().addAll(visualSlot, name, startDateTime, endDateTime, duration, location, organizersBox);
 
@@ -149,5 +164,4 @@ public class ViewerView {
         return card;
     }
 }
-
 

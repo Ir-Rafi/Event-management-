@@ -49,3 +49,4 @@ public class SubOrganizerView {
         alert.showAndWait();
     }
 }
+

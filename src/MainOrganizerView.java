@@ -26,13 +26,15 @@ public class MainOrganizerView {
         Button backBtn = new Button("← Back");
 
         backBtn.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 10;");
+        assignRolesBtn.setOnAction(e -> {
+    new TaskAssignmentWindow(stage);
+});
 
-        assignRolesBtn.setOnAction(e -> showAlert("Assign Roles", "You can assign roles to your team members here."));
         todoBtn.setOnAction(e -> showAlert("To-Do", "You can create your task list here."));
         bookPlacesBtn.setOnAction(e -> {
-    int organizerId = 1; // Replace with actual organizer ID
+     // Replace with actual organizer ID
     int eventId = 0;     // Optional: 0 if this is a pre-booking before event creation
-    new BookingPage(stage, stage.getScene(), organizerId, eventId);
+    new BookingPage(stage, stage.getScene(), eventId);
 });
 
         progressReportBtn.setOnAction(e -> {

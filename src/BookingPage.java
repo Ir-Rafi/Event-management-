@@ -22,7 +22,8 @@ public class BookingPage {
     }
 
     // --- Main BookingPage UI ---
-    public BookingPage(Stage stage, Scene previousScene, int organizerId, int eventId) {
+    public BookingPage(Stage stage, Scene previousScene,  int eventId) {
+        int organizerId = Session.getOrganizerId();
         VBox layout = new VBox(40);
         layout.setAlignment(Pos.TOP_CENTER);
         layout.setPadding(new Insets(40));

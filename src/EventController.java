@@ -212,33 +212,61 @@ long durationDays = calculateDurationDays(startDate, endDate);
             showAlert("Validation Error", "Please select a location", Alert.AlertType.ERROR);
             return;
         }
-        
-        // Collect and validate organizers
-        List<Organizer> organizers = new ArrayList<>();
-        for (OrganizerData orgData : organizersList) {
-    String name = orgData.nameField.getText().trim();
-    String codeText = orgData.codeField.getText().trim();
 
-    if (name.isEmpty() || codeText.isEmpty()) {
-        showAlert("Validation Error", "Please fill in all organizer fields or remove empty organizers", Alert.AlertType.ERROR);
+String currentUsername = Session.getUsername();
+    int currentOrganizerId = Session.getOrganizerId();
+
+    if (currentUsername == null || currentOrganizerId == 0) {
+        showAlert("Authentication Error", "You must be logged in to create an event.", Alert.AlertType.ERROR);
         return;
     }
 
+
+        
+        // Collect and validate organizers
+        List<Organizer> organizers = new ArrayList<>();
+         organizers.add(new Organizer(currentUsername, currentOrganizerId));
+        // ✅ Check booking ONCE for main organizer only
+if (!isPlaceBookedByOrganizer(
+        locationCombo.getValue(),
+        startDate,
+        endDate,
+        startTimeCombo.getValue(),
+        endTimeCombo.getValue(),
+        currentOrganizerId)) {
+
+    showAlert("Booking Error",
+            "You cannot create this event. The place is not booked by you for the selected date/time range.",
+            Alert.AlertType.ERROR);
+    return;
+}
+
+// ✅ Then process other organizers (sub-organizers)
+for (OrganizerData orgData : organizersList) {
+    String name = orgData.nameField.getText().trim();
+    String codeText = orgData.codeField.getText().trim();
+
+    if (name.isEmpty() || codeText.isEmpty()) continue;
+
     int code;
     try {
-        code = Integer.parseInt(codeText);  // Parse code as int
+        code = Integer.parseInt(codeText);
     } catch (NumberFormatException e) {
         showAlert("Validation Error", "Organizer code must be a number!", Alert.AlertType.ERROR);
         return;
     }
 
-    if (!isValidOrganizer(name, code)) {  // Make sure your validation accepts int now
+    if (!isValidOrganizer(name, code)) {
         showAlert("Validation Error", "Organizer " + name + " with ID " + code + " is invalid!", Alert.AlertType.ERROR);
         return;
     }
 
-    organizers.add(new Organizer(name, code));  // Organizer constructor should now accept int
+    boolean alreadyAdded = organizers.stream().anyMatch(o -> o.registrationCode == code);
+    if (!alreadyAdded) {
+        organizers.add(new Organizer(name, code));
+    }
 }
+
 
 
         // Create event
@@ -258,21 +286,7 @@ long durationDays = calculateDurationDays(startDate, endDate);
             durationDays
         );
         
-        // Print event details
-        System.out.println("\n========== EVENT CREATED ==========");
-        System.out.println("Event Name: " + event.name);
-        System.out.println("Date: " + event.date);
-        System.out.println("Time: " + event.startTime + " - " + event.endTime);
-        System.out.println("Location: " + event.location);
-        System.out.println("Description: " + event.description);
-        System.out.println("Color: " + event.color);
-        System.out.println("Total Organizers: " + organizers.size());
-        System.out.println("\n--- Organizers List ---");
-        for (int i = 0; i < organizers.size(); i++) {
-            Organizer org = organizers.get(i);
-            System.out.println((i + 1) + ". Name: " + org.name + " | Code: " + org.registrationCode);
-        }
-        System.out.println("===================================\n");
+       
         
         String message = organizers.size() > 0 
             ? "Event created successfully with " + organizers.size() + " organizer(s)!"
@@ -280,14 +294,18 @@ long durationDays = calculateDurationDays(startDate, endDate);
 
         // Load existing events
 
-int organizerId = organizers.get(0).registrationCode; // Assuming the main organizer is first
-if (!isPlaceBookedByOrganizer(locationCombo.getValue(), startDate, endDate,
-                              startTimeCombo.getValue(), endTimeCombo.getValue(), organizerId)) {
-    showAlert("Booking Error",
-              "You cannot create this event. The place is not booked by you for the selected date/time range.",
-              Alert.AlertType.ERROR);
+
+
+// Check if user is logged in
+if (currentUsername == null || currentOrganizerId == 0) {
+    showAlert("Authentication Error", "You must be logged in to create an event.", Alert.AlertType.ERROR);
     return;
 }
+
+
+
+
+
 
 insertEventIntoDatabase(event);
 
@@ -413,15 +431,21 @@ private Connection getConnection() throws Exception {
 }
 
 private boolean isValidOrganizer(String username, int registrationCode) {
+    // Allow the logged-in organizer
+    if (Session.getUsername() != null &&
+        Session.getUsername().equalsIgnoreCase(username) &&
+        Session.getOrganizerId() == registrationCode) {
+        return true;
+    }
+
+    // Otherwise, check database
     String sql = "SELECT ID FROM users WHERE Username = ? AND ID = ?";
     try (Connection conn = getConnection();
          PreparedStatement ps = conn.prepareStatement(sql)) {
-
         ps.setString(1, username);
         ps.setInt(2, registrationCode);
-
         ResultSet rs = ps.executeQuery();
-        return rs.next(); // true if a row exists
+        return rs.next();
     } catch (Exception e) {
         e.printStackTrace();
         return false;
@@ -455,47 +479,62 @@ private void insertEventIntoDatabase(EventData event) {
         INSERT INTO events (
             event_name, place_name, start_date, end_date,
             start_time, end_time, Description, Color,
-            ShowMe, Visibility, AttachedFilePath, EventImagePath
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ShowMe, Visibility, AttachedFilePath, EventImagePath,
+            organizer_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """;
 
-    try (Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+    try (Connection conn = getConnection()) {
+        // Start transaction
+        conn.setAutoCommit(false);
 
-        ps.setString(1, event.name);
-        ps.setString(2, event.location);
-        ps.setDate(3, java.sql.Date.valueOf(event.date));
-        ps.setDate(4, java.sql.Date.valueOf(event.endDate));
-        ps.setString(5, event.startTime);
-        ps.setString(6, event.endTime);
-        ps.setString(7, event.description);
-        ps.setString(8, event.color);
-        ps.setString(9, event.showMe);
-        ps.setString(10, event.visibility);
-        ps.setString(11, event.attachedFilePath != null ? event.attachedFilePath.getAbsolutePath() : null);
-        ps.setString(12, event.eventImagePath != null ? event.eventImagePath.getAbsolutePath() : null);
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-        ps.executeUpdate();
+            ps.setString(1, event.name);
+            ps.setString(2, event.location);
+            ps.setDate(3, java.sql.Date.valueOf(event.date));
+            ps.setDate(4, java.sql.Date.valueOf(event.endDate));
+            ps.setString(5, event.startTime);
+            ps.setString(6, event.endTime);
+            ps.setString(7, event.description);
+            ps.setString(8, event.color);
+            ps.setString(9, event.showMe);
+            ps.setString(10, event.visibility);
+            ps.setString(11, event.attachedFilePath != null ? event.attachedFilePath.getAbsolutePath() : null);
+            ps.setString(12, event.eventImagePath != null ? event.eventImagePath.getAbsolutePath() : null);
+            ps.setInt(13, event.organizers.get(0).registrationCode); // main organizer
 
-        // Get the generated event_id
-        ResultSet keys = ps.getGeneratedKeys();
-        int eventId = 0;
-        if (keys.next()) {
-            eventId = keys.getInt(1);
+            ps.executeUpdate();
+
+            // Get generated event_id
+            ResultSet keys = ps.getGeneratedKeys();
+            int eventId = 0;
+            if (keys.next()) {
+                eventId = keys.getInt(1);
+            }
+
+            // Insert all organizers (main + sub-organizers)
+            if (!event.organizers.isEmpty()) {
+                insertOrganizers(conn, eventId, event.organizers);
+            }
+
+            conn.commit();
+            System.out.println("✅ Event and organizers saved successfully to MySQL!");
+
+        } catch (Exception e) {
+            conn.rollback(); // rollback on failure
+            e.printStackTrace();
+            showAlert("Database Error", "Failed to save event: " + e.getMessage(), Alert.AlertType.ERROR);
+        } finally {
+            conn.setAutoCommit(true);
         }
-
-        // Insert all organizers for this event
-        if (!event.organizers.isEmpty()) {
-            insertOrganizers(eventId, event.organizers);
-        }
-
-        System.out.println("✅ Event and organizers saved successfully to MySQL!");
 
     } catch (Exception e) {
         e.printStackTrace();
-        showAlert("Database Error", "Failed to save event: " + e.getMessage(), Alert.AlertType.ERROR);
+        showAlert("Database Error", "Failed to save event connection: " + e.getMessage(), Alert.AlertType.ERROR);
     }
 }
+
 
   @SuppressWarnings("unchecked")
 public static List<EventData> loadEventsFromDB() {
@@ -564,11 +603,9 @@ public static List<EventData> loadEventsFromDB() {
 }
 
 
-private void insertOrganizers(int eventId, List<Organizer> organizers) {
+private void insertOrganizers(Connection conn, int eventId, List<Organizer> organizers) throws SQLException {
     String sql = "INSERT INTO organizers (event_id, organizer_name, organizer_id) VALUES (?, ?, ?)";
-    try (Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
         for (Organizer org : organizers) {
             ps.setInt(1, eventId);
             ps.setString(2, org.name);
@@ -576,11 +613,9 @@ private void insertOrganizers(int eventId, List<Organizer> organizers) {
             ps.addBatch();
         }
         ps.executeBatch();
-
-    } catch (Exception e) {
-        e.printStackTrace();
     }
 }
+
 
 private boolean isPlaceBookedByOrganizer(String placeName, LocalDate startDate, LocalDate endDate,
                                          String startTime, String endTime, int organizerId) {
@@ -622,3 +657,4 @@ private boolean isPlaceBookedByOrganizer(String placeName, LocalDate startDate, 
 
 
 }
+
