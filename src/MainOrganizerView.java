@@ -8,16 +8,22 @@ import javafx.stage.Stage;
 
 public class MainOrganizerView {
 
-    public MainOrganizerView(Stage stage, Scene eventListScene) {
+    private final String mainOrganizerName;
+    private final int mainOrganizerId;
+
+    public MainOrganizerView(Stage stage, Scene eventListScene, String mainOrganizerName, int mainOrganizerId) {
+        this.mainOrganizerName = mainOrganizerName;
+        this.mainOrganizerId = mainOrganizerId;
+
         VBox layout = new VBox(25);
         layout.setAlignment(Pos.TOP_CENTER);
         layout.setPadding(new Insets(40));
-
         layout.prefWidthProperty().bind(stage.widthProperty());
         layout.prefHeightProperty().bind(stage.heightProperty());
+        layout.setStyle("-fx-background-color: linear-gradient(to bottom, #E3F2FD, #90CAF9);");
 
         Label title = new Label("Main Organizer Dashboard");
-        title.setStyle("-fx-font-size: 28px; -fx-text-fill: #fff; -fx-font-weight: bold;");
+        title.setStyle("-fx-font-size: 28px; -fx-text-fill: #0D47A1; -fx-font-weight: bold;");
 
         Button assignRolesBtn = new Button("Assign Roles to Members");
         Button todoBtn = new Button("Create To-Do List");
@@ -25,17 +31,23 @@ public class MainOrganizerView {
         Button progressReportBtn = new Button("Manage Progress Reports");
         Button backBtn = new Button("← Back");
 
-        backBtn.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 10;");
+        assignRolesBtn.setStyle("-fx-background-color: #1565C0; -fx-text-fill: white; -fx-background-radius: 10;");
+        todoBtn.setStyle("-fx-background-color: #42A5F5; -fx-text-fill: white; -fx-background-radius: 10;");
+        bookPlacesBtn.setStyle("-fx-background-color: #29B6F6; -fx-text-fill: white; -fx-background-radius: 10;");
+        progressReportBtn.setStyle("-fx-background-color: #26C6DA; -fx-text-fill: white; -fx-background-radius: 10;");
+        backBtn.setStyle("-fx-background-color: #1E88E5; -fx-text-fill: white; -fx-background-radius: 10;");
+
+        // ✅ Corrected call to AssignRolesWindow
         assignRolesBtn.setOnAction(e -> {
-    new TaskAssignmentWindow(stage);
-});
+            new AssignRolesWindow(mainOrganizerName, mainOrganizerId).show();
+        });
 
         todoBtn.setOnAction(e -> showAlert("To-Do", "You can create your task list here."));
+
         bookPlacesBtn.setOnAction(e -> {
-     // Replace with actual organizer ID
-    int eventId = 0;     // Optional: 0 if this is a pre-booking before event creation
-    new BookingPage(stage, stage.getScene(), eventId);
-});
+            int eventId = 0; // optional placeholder
+            new BookingPage(stage, stage.getScene(), eventId);
+        });
 
         progressReportBtn.setOnAction(e -> {
             ProgressReportWindow reportWindow = new ProgressReportWindow();

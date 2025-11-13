@@ -14,8 +14,10 @@ import javafx.util.Duration;
 
 public class after_login extends Application {
     @Override
-    public void start(Stage stage){
+    public void start(Stage stage) {
         stage.setTitle("Event Management App");
+
+        
 
         // --- HOME SCREEN ---
         VBox homeLayout = new VBox(20);
@@ -28,12 +30,9 @@ public class after_login extends Application {
 
         Button eventsButton = new Button("Your Events");
         eventsButton.setFont(Font.font("Poppins", 18));
-        eventsButton.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 12; -fx-padding: 10 25 10 25;");
-        eventsButton.setOnMouseEntered(e -> eventsButton.setStyle("-fx-background-color: #1B4F72; -fx-text-fill: white; -fx-background-radius: 12;"));
-        eventsButton.setOnMouseExited(e -> eventsButton.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 12;"));
+        eventsButton.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 12;");
 
         homeLayout.getChildren().addAll(title, eventsButton);
-        VBox.setVgrow(eventsButton, Priority.ALWAYS);
 
         Scene homeScene = new Scene(homeLayout, 1000, 700);
 
@@ -51,7 +50,7 @@ public class after_login extends Application {
 
         Scene eventsScene = new Scene(eventRoot, 1000, 700);
 
-        // Event data
+        // Example event data
         String[][] eventData = {
             {"Tech Conference", "Main Organizer"},
             {"Cultural Fest", "Sub Organizer"},
@@ -63,32 +62,24 @@ public class after_login extends Application {
             eventsLayout.add(card, i % 3, i / 3);
         }
 
-        // Top bar with back button and create new event button
+        // Top bar
         HBox topBar = new HBox(20);
         topBar.setAlignment(Pos.CENTER_LEFT);
         topBar.setPadding(new Insets(0, 0, 10, 0));
-        
+
         Button backButton = new Button("← Back");
         backButton.setFont(Font.font("Poppins", 14));
-        backButton.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 8 20 8 20;");
+        backButton.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 10;");
         backButton.setOnAction(e -> stage.setScene(homeScene));
-        backButton.setOnMouseEntered(e -> backButton.setStyle("-fx-background-color: #1B4F72; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 8 20 8 20;"));
-        backButton.setOnMouseExited(e -> backButton.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 8 20 8 20;"));
-        
-        // Create New Event Button
+
         Button createEventButton = new Button("+ Create New Event");
         createEventButton.setFont(Font.font("Poppins", FontWeight.BOLD, 14));
-        createEventButton.setStyle("-fx-background-color: #27AE60; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 8 20 8 20;");
-        createEventButton.setOnMouseEntered(e -> createEventButton.setStyle("-fx-background-color: #1E8449; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 8 20 8 20;"));
-        createEventButton.setOnMouseExited(e -> createEventButton.setStyle("-fx-background-color: #27AE60; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 8 20 8 20;"));
-        createEventButton.setOnAction(e -> {
-            EventController.openEventForm(stage);
-        });
-        
+        createEventButton.setStyle("-fx-background-color: #27AE60; -fx-text-fill: white; -fx-background-radius: 10;");
+        createEventButton.setOnAction(e -> EventController.openEventForm(stage));
+
         topBar.getChildren().addAll(backButton, createEventButton);
         eventRoot.getChildren().add(0, topBar);
 
-        // Transition effect
         eventsButton.setOnAction(e -> {
             FadeTransition fade = new FadeTransition(Duration.seconds(0.6), eventRoot);
             fade.setFromValue(0);
@@ -108,7 +99,7 @@ public class after_login extends Application {
         card.setAlignment(Pos.CENTER);
         card.setPadding(new Insets(20));
         card.setPrefSize(250, 150);
-        card.setStyle("-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 10; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 4);");
+        card.setStyle("-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 10; -fx-background-radius: 10;");
 
         Text eventTitle = new Text(eventName);
         eventTitle.setFont(Font.font("Poppins", FontWeight.BOLD, 18));
@@ -116,21 +107,26 @@ public class after_login extends Application {
 
         Text roleText = new Text(role);
         roleText.setFont(Font.font("Poppins", 14));
-        Color roleColor = switch (role) {
-            case "Main Organizer" -> Color.web("#27AE60");
-            case "Sub Organizer" -> Color.web("#F39C12");
-            default -> Color.web("#7F8C8D");
-        };
-        roleText.setFill(roleColor);
+        roleText.setFill(
+            switch (role) {
+                case "Main Organizer" -> Color.web("#27AE60");
+                case "Sub Organizer" -> Color.web("#F39C12");
+                default -> Color.web("#7F8C8D");
+            }
+        );
 
         Button openBtn = new Button("Open");
         openBtn.setFont(Font.font("Poppins", 14));
         openBtn.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 10;");
+
         openBtn.setOnAction(e -> {
+            String loggedInName = Session.getUserName();
+            int loggedInId = Session.getUserId();
+
             switch (role) {
-                case "Main Organizer" -> new MainOrganizerView(stage, eventsScene);
-                case "Sub Organizer" -> new SubOrganizerView(stage, eventsScene);
-                case "Viewer" -> new ViewerView(stage,eventsScene);
+                case "Main Organizer" -> new MainOrganizerView(stage, eventsScene, loggedInName, loggedInId);
+                case "Sub Organizer" -> new SubOrganizerView(stage, eventsScene, loggedInName);
+                case "Viewer" -> new ViewerView(stage, eventsScene);
             }
         });
 

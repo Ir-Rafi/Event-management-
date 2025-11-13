@@ -1,52 +1,135 @@
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SubOrganizerView {
 
-    public SubOrganizerView(Stage stage, Scene eventsScene) {
+    private final String subOrganizerName;
+    private List<AssignRolesWindow.EventTask> tasks = new ArrayList<>();
+    private VBox tasksBox;
+
+    public SubOrganizerView(Stage stage, Scene eventsScene, String subOrganizerName) {
+        this.subOrganizerName = subOrganizerName;
+        loadTasks();
+
         VBox layout = new VBox(25);
+        layout.setPadding(new Insets(30));
         layout.setAlignment(Pos.TOP_CENTER);
-        layout.setPadding(new Insets(40));
+        layout.setStyle("-fx-background-color: linear-gradient(to bottom, #1E1E2F, #2C2C3E);");
 
-        layout.prefWidthProperty().bind(stage.widthProperty());
-        layout.prefHeightProperty().bind(stage.heightProperty());
+        Label title = new Label("Sub-Organizer Dashboard");
+        title.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #FFD700;");
 
-        Label title = new Label("Sub Organizer Dashboard");
-        title.setStyle("-fx-font-size: 28px; -fx-text-fill: #fff; -fx-font-weight: bold;");
+        tasksBox = new VBox(20);
+        tasksBox.setAlignment(Pos.TOP_CENTER);
+        refreshTasks();
 
-        Button assignedTasksBtn = new Button("View Assigned Tasks");
-        Button completeTaskBtn = new Button("Mark Task as Complete");
+        ScrollPane scrollPane = new ScrollPane(tasksBox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background: transparent; -fx-border-color: transparent;");
+
         Button backBtn = new Button("← Back");
-        backBtn.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 10;");
-
-        assignedTasksBtn.setOnAction(e -> showAlert("Assigned Tasks", "These are your assigned tasks from the Main Organizer."));
-        completeTaskBtn.setOnAction(e -> showAlert("Complete Task", "You can mark assigned tasks as completed."));
+        backBtn.setStyle("""
+            -fx-background-color: #444C5C;
+            -fx-text-fill: white;
+            -fx-font-weight: bold;
+            -fx-background-radius: 8;
+            -fx-padding: 8 20 8 20;
+        """);
         backBtn.setOnAction(e -> stage.setScene(eventsScene));
 
-        VBox buttonContainer = new VBox(20, assignedTasksBtn, completeTaskBtn);
-        buttonContainer.setAlignment(Pos.CENTER);
-        buttonContainer.prefWidthProperty().bind(layout.widthProperty().multiply(0.35));
+        layout.getChildren().addAll(title, scrollPane, backBtn);
 
-        layout.getChildren().addAll(title, buttonContainer, backBtn);
-
-        Scene scene = new Scene(layout);
-        scene.getStylesheets().add(getClass().getResource("cssfororganizer.css").toExternalForm());
+        Scene scene = new Scene(layout, 800, 650);
         stage.setScene(scene);
         stage.setMaximized(true);
     }
 
-    private void showAlert(String header, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Sub Organizer Action");
-        alert.setHeaderText(header);
-        alert.setContentText(message);
-        alert.showAndWait();
+    private void refreshTasks() {
+        tasksBox.getChildren().clear();
+
+        List<AssignRolesWindow.EventTask> subTasks = new ArrayList<>();
+        for (AssignRolesWindow.EventTask task : tasks) {
+            if (task.subOrganizerName.equalsIgnoreCase(subOrganizerName)) {
+                subTasks.add(task);
+            }
+        }
+
+        if (subTasks.isEmpty()) {
+            Label emptyLabel = new Label("No tasks assigned yet.");
+            emptyLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #CCCCCC;");
+            tasksBox.getChildren().add(emptyLabel);
+            return;
+        }
+
+        for (AssignRolesWindow.EventTask task : subTasks) {
+            VBox card = new VBox(10);
+            card.setPadding(new Insets(15));
+            card.setStyle("""
+                -fx-background-color: #2F2F3F;
+                -fx-background-radius: 10;
+            """);
+            card.setEffect(new DropShadow(6, Color.BLACK));
+
+            Label eventLabel = new Label("Event ID: " + task.eventId);
+            eventLabel.setStyle("-fx-text-fill: #FFD700; -fx-font-weight: bold; -fx-font-size: 14px;");
+
+            Label taskLabel = new Label(task.taskDescription);
+            taskLabel.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 13px;");
+
+            Label statusLabel = new Label(task.completed ? "✅ Completed" : "⏳ Pending");
+            statusLabel.setStyle(task.completed ? "-fx-text-fill: #4CAF50;" : "-fx-text-fill: #FFA000; -fx-font-weight: bold;");
+
+            Button completeBtn = new Button("Mark Complete");
+            completeBtn.setDisable(task.completed);
+            completeBtn.setStyle("""
+                -fx-background-color: #4CAF50;
+                -fx-text-fill: white;
+                -fx-font-weight: bold;
+                -fx-background-radius: 8;
+                -fx-padding: 5 15 5 15;
+            """);
+            completeBtn.setOnAction(e -> {
+                task.completed = true;
+                saveTasks();
+                refreshTasks();
+            });
+
+            HBox statusRow = new HBox(10);
+            statusRow.setAlignment(Pos.CENTER_LEFT);
+            statusRow.getChildren().addAll(statusLabel, completeBtn);
+
+            card.getChildren().addAll(eventLabel, taskLabel, statusRow);
+            tasksBox.getChildren().add(card);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void loadTasks() {
+        File file = new File("tasks.dat");
+        if (file.exists()) {
+            try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+                tasks = (List<AssignRolesWindow.EventTask>) in.readObject();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void saveTasks() {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("tasks.dat"))) {
+            out.writeObject(tasks);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
-

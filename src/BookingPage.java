@@ -22,12 +22,12 @@ public class BookingPage {
     }
 
     // --- Main BookingPage UI ---
-    public BookingPage(Stage stage, Scene previousScene,  int eventId) {
+    public BookingPage(Stage stage, Scene previousScene, int eventId) {
         int organizerId = Session.getOrganizerId();
         VBox layout = new VBox(40);
         layout.setAlignment(Pos.TOP_CENTER);
         layout.setPadding(new Insets(40));
-        layout.setStyle("-fx-background-color: linear-gradient(to bottom, #1f1c2c, #928dab);"); // Dark gradient
+        layout.setStyle("-fx-background-color: linear-gradient(to bottom, #1f1c2c, #928dab);");
 
         // Title
         Label title = new Label("Choose a Place to Book");
@@ -103,10 +103,21 @@ public class BookingPage {
         // Inputs
         DatePicker startDatePicker = new DatePicker();
         DatePicker endDatePicker = new DatePicker();
-        TextField startTimeField = new TextField();
-        startTimeField.setPromptText("HH:mm");
-        TextField endTimeField = new TextField();
-        endTimeField.setPromptText("HH:mm");
+
+        // ComboBoxes for time selection (30-min interval)
+        ComboBox<String> startTimeCombo = new ComboBox<>();
+        ComboBox<String> endTimeCombo = new ComboBox<>();
+        for (int hour = 0; hour < 24; hour++) {
+            for (int minute = 0; minute < 60; minute += 30) {
+                String time = String.format("%02d:%02d", hour, minute);
+                startTimeCombo.getItems().add(time);
+                endTimeCombo.getItems().add(time);
+            }
+        }
+        startTimeCombo.setPromptText("Start Time");
+        endTimeCombo.setPromptText("End Time");
+        startTimeCombo.setValue("00:00");
+        endTimeCombo.setValue("00:00");
 
         // Styles for inputs
         String inputStyle = """
@@ -121,14 +132,14 @@ public class BookingPage {
         """;
         startDatePicker.setStyle(inputStyle);
         endDatePicker.setStyle(inputStyle);
-        startTimeField.setStyle(inputStyle);
-        endTimeField.setStyle(inputStyle);
+        startTimeCombo.setStyle(inputStyle);
+        endTimeCombo.setStyle(inputStyle);
 
         // Labels
         Label startLabel = new Label("Start Date:");
         Label endLabel = new Label("End Date:");
-        Label startTimeLabel = new Label("Start Time (HH:mm):");
-        Label endTimeLabel = new Label("End Time (HH:mm):");
+        Label startTimeLabel = new Label("Start Time:");
+        Label endTimeLabel = new Label("End Time:");
         startLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
         endLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
         startTimeLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
@@ -159,8 +170,8 @@ public class BookingPage {
                 title,
                 startLabel, startDatePicker,
                 endLabel, endDatePicker,
-                startTimeLabel, startTimeField,
-                endTimeLabel, endTimeField,
+                startTimeLabel, startTimeCombo,
+                endTimeLabel, endTimeCombo,
                 checkBtn, resultLabel, back
         );
 
@@ -170,48 +181,66 @@ public class BookingPage {
         checkBtn.setOnAction(e -> {
             LocalDate startDate = startDatePicker.getValue();
             LocalDate endDate = endDatePicker.getValue();
-            try {
-                LocalTime startTime = LocalTime.parse(startTimeField.getText());
-                LocalTime endTime = LocalTime.parse(endTimeField.getText());
+            String startTime = startTimeCombo.getValue();
+            String endTime = endTimeCombo.getValue();
 
-                try (Connection conn = connect()) {
-                    PreparedStatement ps = conn.prepareStatement("""
-                        SELECT COUNT(*) FROM bookings
-                        WHERE place_name = ?
-                          AND (
-                                (start_date <= ? AND end_date >= ?)
-                            AND (start_time < ? AND end_time > ?)
-                          )
-                    """);
-                    ps.setString(1, placeName);
-                    ps.setDate(2, Date.valueOf(endDate));
-                    ps.setDate(3, Date.valueOf(startDate));
-                    ps.setTime(4, Time.valueOf(endTime));
-                    ps.setTime(5, Time.valueOf(startTime));
+            if (startDate == null || endDate == null) {
+                resultLabel.setText("❌ Please select start and end dates.");
+                return;
+            }
+            if (startTime == null || endTime == null) {
+                resultLabel.setText("❌ Please select start and end times.");
+                return;
+            }
+            if (!isValidTimeRange(startTime, endTime)) {
+                resultLabel.setText("❌ End time must be after start time.");
+                return;
+            }
 
-                    ResultSet rs = ps.executeQuery();
-                    rs.next();
-                    boolean isFree = rs.getInt(1) == 0;
+            try (Connection conn = connect()) {
+                PreparedStatement ps = conn.prepareStatement("""
+                    SELECT COUNT(*) FROM bookings
+                    WHERE place_name = ?
+                      AND (
+                            (start_date <= ? AND end_date >= ?)
+                        AND (start_time < ? AND end_time > ?)
+                      )
+                """);
+                ps.setString(1, placeName);
+                ps.setDate(2, Date.valueOf(endDate));
+                ps.setDate(3, Date.valueOf(startDate));
+                ps.setTime(4, Time.valueOf(endTime + ":00"));
+                ps.setTime(5, Time.valueOf(startTime + ":00"));
 
-                    if (isFree) {
-                        resultLabel.setText("✅ Place available! Booking confirmed.");
-                        bookPlace(conn, placeName, organizerId, startDate, endDate, startTime, endTime);
-                    } else {
-                        resultLabel.setText("❌ Already booked for that time slot.");
-                    }
+                ResultSet rs = ps.executeQuery();
+                rs.next();
+                boolean isFree = rs.getInt(1) == 0;
+
+                if (isFree) {
+                    resultLabel.setText("✅ Place available! Booking confirmed.");
+                    bookPlace(conn, placeName, organizerId, startDate, endDate, startTime, endTime);
+                } else {
+                    resultLabel.setText("❌ Already booked for that time slot.");
                 }
             } catch (Exception ex) {
                 resultLabel.setText("Error: " + ex.getMessage());
             }
         });
-        double width = previousScene.getWidth();
-        double height = previousScene.getHeight();
-        stage.setScene(new Scene(layout, width, height));
+
+        stage.setScene(new Scene(layout, previousScene.getWidth(), previousScene.getHeight()));
+    }
+
+    private boolean isValidTimeRange(String startTime, String endTime) {
+        String[] startParts = startTime.split(":");
+        String[] endParts = endTime.split(":");
+        int startMinutes = Integer.parseInt(startParts[0]) * 60 + Integer.parseInt(startParts[1]);
+        int endMinutes = Integer.parseInt(endParts[0]) * 60 + Integer.parseInt(endParts[1]);
+        return endMinutes > startMinutes;
     }
 
     // --- Book the place in DB ---
     private void bookPlace(Connection conn, String placeName, int organizerId,
-                           LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) throws SQLException {
+                           LocalDate startDate, LocalDate endDate, String startTime, String endTime) throws SQLException {
         PreparedStatement insert = conn.prepareStatement("""
             INSERT INTO bookings (place_name, organizer_id, start_date, end_date, start_time, end_time)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -220,8 +249,8 @@ public class BookingPage {
         insert.setInt(2, organizerId);
         insert.setDate(3, Date.valueOf(startDate));
         insert.setDate(4, Date.valueOf(endDate));
-        insert.setTime(5, Time.valueOf(startTime));
-        insert.setTime(6, Time.valueOf(endTime));
+        insert.setTime(5, Time.valueOf(startTime + ":00"));
+        insert.setTime(6, Time.valueOf(endTime + ":00"));
         insert.executeUpdate();
     }
 }
