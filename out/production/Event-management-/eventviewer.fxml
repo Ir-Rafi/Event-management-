@@ -14,7 +14,7 @@
       spacing="10"
       alignment="TOP_CENTER"
       prefWidth="600" prefHeight="700"
-      stylesheets="@style.css">
+      stylesheets="@style3.css">
 
     <!-- Input Row -->
     <HBox spacing="10" alignment="CENTER_LEFT">

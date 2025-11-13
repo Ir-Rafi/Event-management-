@@ -7,8 +7,7 @@
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="Controller"
-      alignment="CENTER" spacing="2" styleClass="root-box"
-        stylesheets = "@style2.css">
+      alignment="CENTER" spacing="2" styleClass="root-box">
 
     <!-- Your welcome labels HBoxes -->
     <HBox alignment="CENTER" spacing="2">

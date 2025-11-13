@@ -1,14 +1,23 @@
-import javafx.animation.Interpolator;
-import javafx.animation.TranslateTransition;
+import javafx.animation.*;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.scene.Node;
 import javafx.util.Duration;
+
+import java.io.IOException;
 
 public class login_controller {
 
@@ -16,6 +25,8 @@ public class login_controller {
     private AnchorPane Container;
     @FXML
     private Pane forgotPane;
+    @FXML
+    private ProgressIndicator progressIndicator;
 
     // Login Pane
     @FXML
@@ -75,9 +86,12 @@ public class login_controller {
     private PasswordField forgotPass;
     @FXML
     private TextField forgotUser;
-    @FXML private Button Goback;               // the Back button in forgotPane
-    @FXML private PasswordField ConfiirmPass;  // Confirm Password field
-    @FXML private Label passMismatch;          // error label for mismatch
+    @FXML
+    private Button Goback;               // the Back button in forgotPane
+    @FXML
+    private PasswordField ConfiirmPass;  // Confirm Password field
+    @FXML
+    private Label passMismatch;          // error label for mismatch
 
     @FXML
     public void initialize() {
@@ -174,33 +188,92 @@ public class login_controller {
 
         if (!hasError) {
             // Assume login is successful, proceed to the next screen
-            if (DatabaseUtility.checkUserExists(username, password)) {
 
-                // ✅ Save remember-me status
-                if (rememberMe)
-                    RememberMeUtility.saveUser(username);
-                else
-                    RememberMeUtility.clearRememberedUser();
-                showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome back, " + username + "!");
-                // Here, you can also implement 'Remember Me' logic
-                // E.g., store username/password/token in a file, or session cookie
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Hello5.fxml"));
-                    Parent root = loader.load();
-
-                    Stage stage = (Stage) loginBtn.getScene().getWindow();
-                    Scene scene = new Scene(root, 1280, 720);
-                    scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
-                    stage.setScene(scene);
-                    stage.setTitle("Event Management App");
-                    stage.show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid username or password.");
+            if(progressIndicator != null){
+                progressIndicator.setVisible(true);
             }
+            loginBtn.setDisable(true);
 
+            final String[] dots = {"", ".", "..", "..."};
+            final int[] dotIndex = {0};
+
+            Timeline timeline = new Timeline(new KeyFrame(Duration.millis(500), e -> {
+                dotIndex[0] = (dotIndex[0]+1) % dots.length;
+                loginBtn.setText("Logging in"+dots[dotIndex[0]]);
+            }));
+
+            timeline.setCycleCount(Timeline.INDEFINITE);
+            timeline.play();
+
+            Task<Boolean> loginTask = new Task<Boolean>(){
+                @Override
+                protected Boolean call() throws Exception{
+                    return DatabaseUtility.checkUserExists(username, password);
+                }
+            };
+
+            loginTask.setOnSucceeded(event -> {
+                Boolean success = loginTask.getValue();
+
+                timeline.stop();
+                if(progressIndicator!=null){
+                    progressIndicator.setVisible(false);
+                }
+
+                loginBtn.setDisable(false);
+                loginBtn.setText("Login");
+
+                if(success) {
+                    int organizerID = DatabaseUtility.getUserId(username);
+                    Session.setSession(organizerID, username);
+
+                    if(rememberMe){
+                        RememberMeUtility.saveUser(username);
+                    }
+                    else{
+                        RememberMeUtility.clearRememberedUser();
+                    }
+
+                    showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome back, "+username+"!");
+
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("dashboard.fxml"));
+                        Parent root = loader.load();
+
+                        DashboardController controller = loader.getController();
+                        controller.setLoggedInUsername(username);  // << send username
+
+                        Stage stage = (Stage) loginBtn.getScene().getWindow();
+                        stage.setScene(new Scene(root));
+                        stage.setMaximized(true);
+                        stage.show();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                else{
+                    showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid Username or password");
+                }
+            });
+
+            loginTask.setOnFailed(event -> {
+                // Stop the animation and hide progress indicator
+                timeline.stop();
+                if (progressIndicator != null) {
+                    progressIndicator.setVisible(false);
+                }
+                loginBtn.setDisable(false);
+                loginBtn.setText("Login");
+
+                showAlert(Alert.AlertType.ERROR, "Login Failed", "An error occurred. Please try again.");
+                loginTask.getException().printStackTrace();
+            });
+
+            // Start the background thread
+            Thread thread = new Thread(loginTask);
+            thread.setDaemon(true);
+            thread.start();
         }
     }
 
@@ -239,37 +312,101 @@ public class login_controller {
         }
 
         if (!hasError) {
-            // Registration success, transition to login
-            if (DatabaseUtility.userExists(username)) {
-                userRegError.setText("Username already taken");
-                return;
+            // Show progress indicator and disable button
+            if (progressIndicator != null) {
+                progressIndicator.setVisible(true);
             }
-            if (DatabaseUtility.emailExists(email)) {
-                emailRegError.setText("Email already registered");
-                return;
-            }
-            if (DatabaseUtility.registerUser(username, email, password)) {
-                showAlert(Alert.AlertType.INFORMATION, "Registration Success", "Welcome, " + username + "!");
+            regBtn.setDisable(true);
+            final String[] dots = {"", ".", "..", "..."};
+            final int[] dotIndex = {0};
 
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Form.fxml"));
-                    Parent root = loader.load();
+            Timeline timeline = new Timeline(new KeyFrame(Duration.millis(500), e -> {
+                dotIndex[0] = (dotIndex[0] + 1) % dots.length;
+                regBtn.setText("Processing" + dots[dotIndex[0]]);
+            }));
+            timeline.setCycleCount(Timeline.INDEFINITE);
+            timeline.play();
 
-                    Stage stage = (Stage) regBtn.getScene().getWindow();
-                    Scene scene = new Scene(root);
-                    scene.getStylesheets().add(getClass().getResource("form.css").toExternalForm());
-                    stage.setScene(scene);
-                    stage.setTitle("Registration Form");
-                    stage.show();
-                } catch (Exception e) {
-                    e.printStackTrace();
+            // Run database operations on a background thread
+            Task<Boolean> registrationTask = new Task<Boolean>() {
+                @Override
+                protected Boolean call() throws Exception {
+                    // Check if username exists
+                    if (DatabaseUtility.userExists(username)) {
+                        updateMessage("username_taken");
+                        return false;
+                    }
+
+                    // Check if email exists
+                    if (DatabaseUtility.emailExists(email)) {
+                        updateMessage("email_taken");
+                        return false;
+                    }
+
+                    // Register user
+                    boolean success = DatabaseUtility.registerUser(username, email, password);
+                    if (success) {
+                        updateMessage("success");
+                    }
+                    return success;
                 }
-                slideToLogin();
-                // After successful registration, switch to the login screen
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Registration Failed", "Username or email may already be taken.");
-            }
+            };
 
+            registrationTask.setOnSucceeded(event -> {
+                Boolean success = registrationTask.getValue();
+                String message = registrationTask.getMessage();
+
+                // Hide progress indicator and re-enable button
+                timeline.stop();
+                if (progressIndicator != null) {
+                    progressIndicator.setVisible(false);
+                }
+                regBtn.setDisable(false);
+                regBtn.setText("Register");
+
+                if ("username_taken".equals(message)) {
+                    userRegError.setText("Username already taken");
+                } else if ("email_taken".equals(message)) {
+                    emailRegError.setText("Email already registered");
+                } else if (success) {
+                    showAlert(Alert.AlertType.INFORMATION, "Registration Success", "Welcome, " + username + "!");
+
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("Form.fxml"));
+                        Parent root = loader.load();
+
+                        Stage stage = (Stage) regBtn.getScene().getWindow();
+                        Scene scene = new Scene(root);
+                        scene.getStylesheets().add(getClass().getResource("form.css").toExternalForm());
+                        stage.setScene(scene);
+                        stage.setTitle("Registration Form");
+                        stage.show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    slideToLogin();
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Registration Failed", "An error occurred during registration.");
+                }
+            });
+
+            registrationTask.setOnFailed(event -> {
+                // Hide progress indicator and re-enable button
+                timeline.stop();
+                if (progressIndicator != null) {
+                    progressIndicator.setVisible(false);
+                }
+                regBtn.setDisable(false);
+                regBtn.setText("Register");
+
+                showAlert(Alert.AlertType.ERROR, "Registration Failed", "An error occurred. Please try again.");
+                registrationTask.getException().printStackTrace();
+            });
+
+            // Start the background thread
+            Thread thread = new Thread(registrationTask);
+            thread.setDaemon(true);
+            thread.start();
         }
     }
 
@@ -306,7 +443,7 @@ public class login_controller {
         String confirmPassword = ConfiirmPass.getText();
 
         passMismatch.setText("");
-        if (username.isEmpty() || newPassword.isEmpty()||confirmPassword.isEmpty()) {
+        if (username.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Error", "Please fill in all fields.");
             return;
         }
@@ -333,3 +470,4 @@ public class login_controller {
         }
     }
 }
+

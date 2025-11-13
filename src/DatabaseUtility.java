@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.Properties;
 
-import org.mindrot.jbcrypt.BCrypt;
+import org.mindrot.jbcrypt.BCrypt; // This was missing
 
 public class DatabaseUtility {
     private static final String URL = "jdbc:mysql://ununqd8usvy0wouy:GmDEehgTBjzyuPRuA8i8@b1gtvncwynmgz6qozokc-mysql.services.clever-cloud.com:3306/b1gtvncwynmgz6qozokc";
@@ -102,4 +102,43 @@ public class DatabaseUtility {
         return false;
     }
 
+    public static int getUserId(String username) {
+    String query = "SELECT id FROM users WHERE username = ?";
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(query)) {
+        ps.setString(1, username);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt("id");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return -1;
 }
+
+    public static String[] getUserDetails(String username) {
+        String query = "SELECT username, email FROM users WHERE username = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String uname = rs.getString("username");
+                String email = rs.getString("email");
+                return new String[]{uname, email};
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+}
+
+
+   
