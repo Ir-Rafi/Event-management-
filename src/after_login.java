@@ -11,8 +11,26 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.animation.FadeTransition;
 import javafx.util.Duration;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+
 
 public class after_login extends Application {
+
+    private void applyHoverEffect(Button btn, String normalColor, String hoverColor) {
+
+        btn.setStyle("-fx-background-color: " + normalColor + "; -fx-text-fill: white; -fx-background-radius: 10;");
+
+        btn.setOnMouseEntered(e -> {
+            btn.setStyle("-fx-background-color: " + hoverColor + "; -fx-text-fill: white; -fx-background-radius: 10;");
+            btn.setCursor(javafx.scene.Cursor.HAND);
+        });
+
+        btn.setOnMouseExited(e -> {
+            btn.setStyle("-fx-background-color: " + normalColor + "; -fx-text-fill: white; -fx-background-radius: 10;");
+        });
+    }
+
     @Override
     public void start(Stage stage) {
         stage.setTitle("Event Management App");
@@ -20,6 +38,29 @@ public class after_login extends Application {
         
 
         // --- HOME SCREEN ---
+
+        Button dashboardBack = new Button("← Back to Dashboard");
+        dashboardBack.setFont(Font.font("Poppins", 16));
+        dashboardBack.setStyle("-fx-background-color: #555; -fx-text-fill: white; -fx-background-radius: 10;");
+
+        dashboardBack.setOnMouseEntered(e -> dashboardBack.setStyle(
+                "-fx-background-color: #333; -fx-text-fill: white; -fx-background-radius: 10;"
+        ));
+        dashboardBack.setOnMouseExited(e -> dashboardBack.setStyle(
+                "-fx-background-color: #555; -fx-text-fill: white; -fx-background-radius: 10;"
+        ));
+
+        dashboardBack.setOnAction(e -> {
+            try {
+                Parent dashboardRoot = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
+                Scene dashboardScene = new Scene(dashboardRoot, 900, 600);
+                stage.setScene(dashboardScene);
+                stage.setMaximized(true);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
         VBox homeLayout = new VBox(20);
         homeLayout.setAlignment(Pos.CENTER);
         homeLayout.setPadding(new Insets(50));
@@ -31,6 +72,7 @@ public class after_login extends Application {
         Button eventsButton = new Button("Your Events");
         eventsButton.setFont(Font.font("Poppins", 18));
         eventsButton.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 12;");
+        applyHoverEffect(eventsButton, "#2E86DE", "#1B4F72");
 
         homeLayout.getChildren().addAll(title, eventsButton);
 
@@ -71,11 +113,13 @@ public class after_login extends Application {
         backButton.setFont(Font.font("Poppins", 14));
         backButton.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 10;");
         backButton.setOnAction(e -> stage.setScene(homeScene));
+        applyHoverEffect(backButton, "#2E86DE", "#1B4F72");
 
         Button createEventButton = new Button("+ Create New Event");
         createEventButton.setFont(Font.font("Poppins", FontWeight.BOLD, 14));
         createEventButton.setStyle("-fx-background-color: #27AE60; -fx-text-fill: white; -fx-background-radius: 10;");
         createEventButton.setOnAction(e -> EventController.openEventForm(stage));
+        applyHoverEffect(createEventButton, "#27AE60", "#1E8449");
 
         topBar.getChildren().addAll(backButton, createEventButton);
         eventRoot.getChildren().add(0, topBar);
@@ -118,6 +162,10 @@ public class after_login extends Application {
         Button openBtn = new Button("Open");
         openBtn.setFont(Font.font("Poppins", 14));
         openBtn.setStyle("-fx-background-color: #2E86DE; -fx-text-fill: white; -fx-background-radius: 10;");
+
+        // Hover effects
+        applyHoverEffect(openBtn, "#2E86DE", "#1B4F72");
+
 
         openBtn.setOnAction(e -> {
             String loggedInName = Session.getUserName();
