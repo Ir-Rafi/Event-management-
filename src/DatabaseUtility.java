@@ -3,8 +3,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Properties;
+import javafx.application.Platform;
 
 import org.mindrot.jbcrypt.BCrypt; // This was missing
+
+import javafx.scene.control.Alert;
 
 public class DatabaseUtility {
     private static final String URL = "jdbc:mysql://ununqd8usvy0wouy:GmDEehgTBjzyuPRuA8i8@b1gtvncwynmgz6qozokc-mysql.services.clever-cloud.com:3306/b1gtvncwynmgz6qozokc";
@@ -70,6 +73,61 @@ public class DatabaseUtility {
 
         return false;
     }
+
+//     public static boolean userExists(String username) {
+//     String query = "SELECT * FROM users WHERE username = ?";
+
+//     try (Connection conn = getConnection();
+//          PreparedStatement stmt = conn.prepareStatement(query)) {
+
+//         stmt.setString(1, username);
+//         ResultSet rs = stmt.executeQuery();
+//         return rs.next();
+
+//     } catch (SQLException e) {
+
+//         // Show user-friendly alert
+//         Alert alert = new Alert(Alert.AlertType.ERROR);
+//         alert.setTitle("Database Error");
+//         alert.setHeaderText("Database Operation Failed");
+//         alert.setContentText("Could not check username. Please try again later.");
+//         alert.showAndWait();
+
+//         e.printStackTrace(); // Developer debugging
+//     }
+
+//     // Recovery: safely return false instead of crashing
+//     return false;
+// }
+
+
+// public static boolean userExists(String username) {
+//     String query = "SELECT * FROM users WHERE username = ?";
+
+//     try (Connection conn = getConnection();
+//          PreparedStatement stmt = conn.prepareStatement(query)) {
+
+//         stmt.setString(1, username);
+//         ResultSet rs = stmt.executeQuery();
+//         return rs.next();
+
+//     } catch (SQLException e) {
+
+//         // Show user-friendly alert on the JavaFX application thread
+//         Platform.runLater(() -> {
+//             Alert alert = new Alert(Alert.AlertType.ERROR);
+//             alert.setTitle("Database Error");
+//             alert.setHeaderText("Database Operation Failed");
+//             alert.setContentText("Could not check username. Please try again later.");
+//             alert.showAndWait();
+//         });
+
+//         e.printStackTrace(); // Developer debugging
+//     }
+
+//     // Recovery: safely return false instead of crashing
+//     return false;
+// }
 
     // Check if an email already exists in the DB
     public static boolean emailExists(String email) {
