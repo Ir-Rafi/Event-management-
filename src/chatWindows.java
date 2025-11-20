@@ -11,6 +11,10 @@ public class chatWindows {
             FXMLLoader loader = new FXMLLoader(chatWindows.class.getResource("Chat.fxml"));
             Parent root = loader.load();
 
+            ChatController controller = loader.getController();
+            controller.setLoggedInUsername(displayName);
+            controller.startServer();
+
             Stage stage = new Stage();
             stage.setTitle("Organizer Chat (Server) - " + displayName);
             stage.setScene(new Scene(root, 480, 600));
@@ -37,7 +41,7 @@ public class chatWindows {
             // 2️⃣ Get controller and set name + connect
             ClientController controller = loader.getController();
             controller.setDisplayName(displayName);
-            controller.connectToServer("192.168.1.11", 1234); // or your server IP
+            controller.connectToServer("10.33.17.195", 1234); // or your server IP
 
             // 3️⃣ Open window
             Stage stage = new Stage();

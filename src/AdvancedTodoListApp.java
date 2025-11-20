@@ -273,33 +273,36 @@ public class AdvancedTodoListApp extends Application {
     }
 
     private void filterTasks() {
-        String filter = filterCombo.getValue();
-        String priority = priorityCombo.getValue();
-        String category = categoryCombo.getValue();
-        String search = searchField.getText().toLowerCase();
 
-        ObservableList<Task> filtered = FXCollections.observableArrayList();
+        new Thread(() -> {
+            String filter = filterCombo.getValue();
+            String priority = priorityCombo.getValue();
+            String category = categoryCombo.getValue();
+            String search = searchField.getText().toLowerCase();
 
-        for (Task task : allTasks) {
-            boolean matchFilter = filter.equals("All Tasks") ||
-                    (filter.equals("Completed") && task.isCompleted()) ||
-                    (filter.equals("Pending") && !task.isCompleted());
+            ObservableList<Task> filtered = FXCollections.observableArrayList();
 
-            boolean matchPriority = priority.equals("All Priorities") ||
-                    task.getPriority().equals(priority);
+            for (Task task : allTasks) {
+                boolean matchFilter = filter.equals("All Tasks") ||
+                        (filter.equals("Completed") && task.isCompleted()) ||
+                        (filter.equals("Pending") && !task.isCompleted());
 
-            boolean matchCategory = category.equals("All Categories") ||
-                    task.getCategories().contains(category);
+                boolean matchPriority = priority.equals("All Priorities") ||
+                        task.getPriority().equals(priority);
 
-            boolean matchSearch = search.isEmpty() ||
-                    task.getText().toLowerCase().contains(search);
+                boolean matchCategory = category.equals("All Categories") ||
+                        task.getCategories().contains(category);
 
-            if (matchFilter && matchPriority && matchCategory && matchSearch) {
-                filtered.add(task);
+                boolean matchSearch = search.isEmpty() ||
+                        task.getText().toLowerCase().contains(search);
+
+                if (matchFilter && matchPriority && matchCategory && matchSearch) {
+                    filtered.add(task);
+                }
             }
-        }
 
-        taskListView.setItems(filtered);
+            taskListView.setItems(filtered);
+        }).start();
     }
 
     private void updateStats() {

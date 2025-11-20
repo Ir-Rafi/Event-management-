@@ -385,7 +385,7 @@ insertEventIntoDatabase(event);
     }
 
     // Event data holder
-     static class EventData implements Serializable {
+     public static class EventData implements Serializable {
         String name, startTime, endTime, location, description, color, showMe, visibility;
         LocalDate date;
             LocalDate endDate;       // calculated end date
@@ -429,7 +429,7 @@ private Connection getConnection() throws Exception {
     return DriverManager.getConnection(url, user, password);
 }
 
-private boolean isValidOrganizer(String username, int registrationCode) {
+ boolean isValidOrganizer(String username, int registrationCode) {
     // Allow the logged-in organizer
     if (Session.getUsername() != null &&
         Session.getUsername().equalsIgnoreCase(username) &&
@@ -602,7 +602,7 @@ public static List<EventData> loadEventsFromDB() {
 }
 
 
-private void insertOrganizers(Connection conn, int eventId, List<Organizer> organizers) throws SQLException {
+ void insertOrganizers(Connection conn, int eventId, List<Organizer> organizers) throws SQLException {
     String sql = "INSERT INTO organizers (event_id, organizer_name, organizer_id) VALUES (?, ?, ?)";
     try (PreparedStatement ps = conn.prepareStatement(sql)) {
         for (Organizer org : organizers) {
@@ -721,10 +721,6 @@ public static List<EventData> loadUserEvents(String username, int organizerId) {
 
     return events;
 }
-
-
-
-
 
 
 

@@ -8,11 +8,25 @@ public class Client {
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
 
-    public Client(String host, int port) {
+    public Client(String host, int port, String clientUsername) {
         try {
             this.socket = new Socket(host, port);
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+
+            bufferedWriter.write(clientUsername);
+            bufferedWriter.newLine();
+            bufferedWriter.flush();
+
+            // Receive the server's logged-in message
+            String serverMessage = bufferedReader.readLine();
+            while ((serverMessage = bufferedReader.readLine()) != null) {
+                System.out.println(serverMessage);
+                // The first message is the welcome message, rest are previous chat messages
+                // You can differentiate if needed
+                break; // Only receive welcome message here, rest in receiveMessages
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
             closeEverything();
@@ -31,7 +45,7 @@ public class Client {
     }
 
     public void receiveMessages(VBox vbox) {
-        new Thread(() -> {
+        Thread receiverThread = new Thread(() -> {
             while (socket != null && socket.isConnected()) {
                 try {
                     String msg = bufferedReader.readLine();
@@ -43,7 +57,9 @@ public class Client {
                     break;
                 }
             }
-        }).start();
+        });
+        receiverThread.setDaemon(true);
+        receiverThread.start();
     }
 
     public void closeEverything() {

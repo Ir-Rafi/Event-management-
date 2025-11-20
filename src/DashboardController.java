@@ -1,3 +1,5 @@
+import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -14,7 +16,11 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.geometry.Pos;
 import java.io.File;
+
 import java.util.List;
+
+
+
 
 
 public class DashboardController extends Controller {
@@ -50,10 +56,10 @@ public class DashboardController extends Controller {
 
     // ---------------- PROFILE DATA ----------------
     public void setProfile(String name, String email, String dept, String session) {
-        nameLabel.setText(name);
+        nameLabel.setText(Session.getUserName() + " (ID: " + Session.getUserId() + ")");
         emailLabel.setText(email);
-        deptLabel.setText("🏫 " + dept);
-        sessionLabel.setText("📚 Session: " + session);
+        deptLabel.setText("" + dept);
+        sessionLabel.setText("" + session);
 
         if (profileInitialLabel == null) {
             profileInitialLabel = new Label();
@@ -118,7 +124,7 @@ public class DashboardController extends Controller {
                 try { new after_login().openEventPortal(stage, stage.getScene()); } 
                 catch(Exception e){ e.printStackTrace(); } break;
             case "Change Password": showPasswordChangeDialog(stage); break;
-            case "Sign Out": DashboardController.loadLoginPage(stage); break;
+            case "Sign Out": DashboardController.loadingLoginPage(stage); break;
             default: showAlert(opt + " clicked");
         }
     }
@@ -223,9 +229,78 @@ private void showPasswordChangeDialog(Stage stage) {
     private void showAlert(String msg){ new Alert(Alert.AlertType.INFORMATION,msg,ButtonType.OK).show(); }
 
     // ---------------- LOAD USER PROFILE ----------------
-    public void setLoggedInUsername(String username){
-        this.loggedInUsername=username;
-        if(nameLabel!=null) Platform.runLater(()->{ loadUserProfile(); buildEventList(); });
+    public void setLoggedInUsername(String username) {
+        this.loggedInUsername = username;
+
+        if (nameLabel != null) {
+
+            // STEP 1 — Immediately show profile placeholder
+            nameLabel.setText("Loading...");
+            emailLabel.setText("");
+            deptLabel.setText("");
+            sessionLabel.setText("");
+
+            // STEP 2 — Smooth fade animation
+            FadeTransition ft = new FadeTransition(Duration.millis(400), nameLabel);
+            ft.setFromValue(0.3);
+            ft.setToValue(1.0);
+            ft.play();
+
+            // STEP 3 — Load profile and events in background
+            new Thread(() -> {
+
+                // Heavy DB work here (off UI thread)
+                String[] details = DatabaseUtility.getUserDetails(username);
+                List<EventController.EventData> userEvents =
+                        EventController.loadUserEvents(username);
+
+                // STEP 4 — Update UI step-by-step with animations
+                Platform.runLater(() -> {
+
+                    // Update actual profile
+                    if (details != null)
+                        setProfile(details[0], details[1], details[2], details[3]);
+
+                    // STEP 4A — Smoothly show event list placeholder
+                    eventsListBox.getChildren().clear();
+                    Label loading = new Label("Loading your events...");
+                    loading.setStyle("-fx-text-fill: #ccc; -fx-padding: 5;");
+                    eventsListBox.getChildren().add(loading);
+
+                    FadeTransition ft2 = new FadeTransition(Duration.millis(400), eventsListBox);
+                    ft2.setFromValue(0);
+                    ft2.setToValue(1);
+                    ft2.play();
+
+                    // STEP 5 — After a small delay, load event cards
+                    PauseTransition pause = new PauseTransition(Duration.millis(300));
+                    pause.setOnFinished(ev -> {
+
+                        eventsListBox.getChildren().clear();
+
+                        if (userEvents.isEmpty()) {
+                            Label empty = new Label("No events assigned.");
+                            empty.setStyle("-fx-text-fill: #ccc; -fx-padding: 10;");
+                            eventsListBox.getChildren().add(empty);
+                            return;
+                        }
+
+                        // Add events one by one with a slight delay → feels interactive
+                        new Thread(() -> {
+                            for (EventController.EventData evData : userEvents) {
+
+                                Platform.runLater(() ->
+                                        eventsListBox.getChildren().add(createEventCard(evData))
+                                );
+
+                                try { Thread.sleep(120); } catch (Exception ignored) {}
+                            }
+                        }).start();
+                    });
+                    pause.play();
+                });
+            }).start();
+        }
     }
 
     private void loadUserProfile(){
@@ -235,58 +310,82 @@ private void showPasswordChangeDialog(Stage stage) {
     }
 
     // ---------------- LOAD EVENTS ----------------
-    private void buildEventList(){
-        eventsListBox.getChildren().clear();
-        List<EventController.EventData> userEvents=EventController.loadUserEvents(loggedInUsername);
-        if(userEvents.isEmpty()){ 
-            Label empty=new Label("No events assigned"); empty.setStyle("-fx-text-fill: #ccc; -fx-padding: 10;");
-            eventsListBox.getChildren().add(empty); return; 
-        }
-        for(EventController.EventData ev: userEvents) eventsListBox.getChildren().add(createEventCard(ev));
-    }
+private void buildEventList() {
+    eventsListBox.getChildren().clear();
 
-private VBox createEventCard(EventController.EventData event){
+    Label loading = new Label("Loading your events...");
+    loading.setStyle("-fx-text-fill: #cccccc; -fx-padding: 10;");
+    eventsListBox.getChildren().add(loading);
+
+    new Thread(() -> {
+        List<EventController.EventData> userEvents = EventController.loadUserEvents(loggedInUsername);
+
+        Platform.runLater(() -> {
+            eventsListBox.getChildren().clear();
+
+            if (userEvents.isEmpty()) {
+                Label empty = new Label("No events assigned.");
+                empty.setStyle("-fx-text-fill: #ccc; -fx-padding: 10;");
+                eventsListBox.getChildren().add(empty);
+                return;
+            }
+
+            for (EventController.EventData event : userEvents) {
+                eventsListBox.getChildren().add(createEventCard(event));
+            }
+        });
+
+    }).start();
+}
+
+
+private VBox createEventCard(EventController.EventData event) {
     VBox card = new VBox(8);
     card.setPadding(new Insets(15));
     card.setAlignment(Pos.TOP_CENTER);
-    card.setPrefWidth(360); // ensure consistent width
-
-    String bgColor = event.color != null ? event.color : "#444";
+    card.setPrefWidth(150);  // Ensure consistent width for square cards
+    card.setMaxWidth(150);   // Prevent it from resizing beyond this
 
     // Set background color of card itself
+    String bgColor = event.color != null ? event.color : "#444";  // Set background color
+
+    // Style the card with a background color and border
     card.setStyle("-fx-background-color: " + bgColor + "AA;" +
                   "-fx-background-radius: 12;" +
                   "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 12,0,0,6);");
 
     // Add event image if exists
-    if(event.eventImagePath != null && event.eventImagePath.exists()){
-        try{
-            Image img = new Image(event.eventImagePath.toURI().toString(),360,160,true,true);
+    if (event.eventImagePath != null && event.eventImagePath.exists()) {
+        try {
+            Image img = new Image(event.eventImagePath.toURI().toString(), 150, 150, true, true);
             ImageView iv = new ImageView(img);
-            iv.setFitWidth(360);
-            iv.setFitHeight(160);
-            Rectangle clip = new Rectangle(360,160);
-            clip.setArcWidth(20); clip.setArcHeight(20);
+            iv.setFitWidth(150);   // Ensure image is square
+            iv.setFitHeight(150);  // Ensure image is square
+            Rectangle clip = new Rectangle(150, 150);
+            clip.setArcWidth(20);  // Rounded corners
+            clip.setArcHeight(20); // Rounded corners
             iv.setClip(clip);
-            card.getChildren().add(iv); // add image directly to card
-        }catch(Exception e){
-            // ignore, fallback to colored background
+            card.getChildren().add(iv); // Add image directly to card
+        } catch (Exception e) {
+            // If image fails to load, fallback to colored background
         }
     }
 
     // Add event name
     Label name = new Label("📌 " + event.name);
-    name.setStyle("-fx-text-fill:white;-fx-font-size:18px;-fx-font-weight:bold;");
+    name.setStyle("-fx-text-fill:white;-fx-font-size:16px;-fx-font-weight:bold;");
     card.getChildren().add(name);
 
+    // Add mouse hover effects for interactivity
     card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: " + bgColor + "CC; -fx-background-radius:12;" +
             "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.9),18,0,0,8); -fx-scale-x:1.03; -fx-scale-y:1.03;"));
     card.setOnMouseExited(e -> card.setStyle("-fx-background-color: " + bgColor + "AA; -fx-background-radius:12;" +
             "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.7),12,0,0,6); -fx-scale-x:1; -fx-scale-y:1;"));
-    card.setOnMouseClicked(e -> System.out.println("Clicked event: "+event.name));
+    card.setOnMouseClicked(e -> System.out.println("Clicked event: " + event.name));
 
     return card;
 }
+
 
 }
 

@@ -43,8 +43,27 @@ public class ClientController implements Initializable {
     }
 
     public void connectToServer(String host, int port) {
-        client = new Client(host, port);
-        client.receiveMessages(vbox_messages);
+
+        if (displayName == null || displayName.isEmpty()) {
+            System.out.println("Client username not set!");
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                client = new Client(host, port, displayName);
+
+                client.receiveMessages(vbox_messages);
+
+                // Show login message on UI thread
+                Platform.runLater(() ->
+                        addLabel("You logged in as: " + displayName, vbox_messages)
+                );
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     private void handleSend(ActionEvent event) {

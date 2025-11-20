@@ -71,6 +71,23 @@ public class DatabaseUtility {
         return false;
     }
 
+    // Check if a user exists with both username and email
+public static boolean userExists(String username, String email) {
+    String query = "SELECT 1 FROM users WHERE username = ? AND email = ?";
+    try (Connection conn = getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+        stmt.setString(1, username);
+        stmt.setString(2, email);
+        ResultSet rs = stmt.executeQuery();
+        return rs.next();  // Returns true if such a user exists
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return false;
+}
+
+
     // Check if an email already exists in the DB
     public static boolean emailExists(String email) {
         String query = "SELECT 1 FROM users WHERE email = ?";
@@ -117,7 +134,13 @@ public class DatabaseUtility {
     return -1;
 }
 
-   public static String[] getUserDetails(String username) {
+    public static String[] getServerAndClientNames(String username) {
+        // Just return the username as both server and client name
+        return new String[]{username, username};
+    }
+
+
+    public static String[] getUserDetails(String username) {
     String query = "SELECT username, email, department, session FROM users WHERE username = ?";
 
     try (Connection conn = getConnection();
