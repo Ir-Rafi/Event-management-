@@ -417,4 +417,8 @@ class Task {
     public void setDueDate(String dueDate) { this.dueDate = dueDate; }
     public ArrayList<String> getCategories() { return categories; }
     public void setCategories(ArrayList<String> categories) { this.categories = categories; }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 6025839 (Initial commit)

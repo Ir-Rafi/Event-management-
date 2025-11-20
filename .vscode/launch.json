@@ -3,6 +3,16 @@
     "configurations": [
         {
             "type": "java",
+<<<<<<< HEAD
+=======
+            "name": "Dashboard",
+            "request": "launch",
+            "mainClass": "Dashboard",
+            "projectName": "Event-management--Maheru_dd9fb264"
+        },
+        {
+            "type": "java",
+>>>>>>> 6025839 (Initial commit)
             "name": "AdvancedTodoListApp",
             "request": "launch",
             "mainClass": "AdvancedTodoListApp",

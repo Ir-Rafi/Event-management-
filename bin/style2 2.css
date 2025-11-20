@@ -1,0 +1,205 @@
+/* ============================
+   ROOT BACKGROUND (Dark Space + Grid)
+   ============================ */
+   .root-box {
+    -fx-padding: 80;
+    -fx-background-color: 
+        linear-gradient(
+            to bottom,
+            #0a0c19,
+            #1e213d 50%,
+            #0a0c19
+        );
+
+    /* Grid lines like ChainFund */
+
+    /* Radial glow effect */
+    -fx-effect: innershadow(gaussian, rgba(90,120,255,0.3), 200, 0.6, 0, -100);
+}
+
+/* ============================
+   SMALL HEADER TEXT (150+ organizations)
+   ============================ */
+.LeftWelcomeLabel {
+    -fx-font-family: "Segoe UI Light", "Helvetica Neue Light", "Arial";
+    -fx-font-size: 16px;
+    -fx-text-fill: rgba(160,170,200,0.6);
+    -fx-font-weight: 300;
+    -fx-letter-spacing: 1px;
+}
+
+/* ============================
+   MAIN HEADLINE (Investing with us Beyond Boundaries)
+   ============================ */
+.RightPlan-it {
+    -fx-font-family: "Segoe UI", "Helvetica Neue", "Arial";
+    -fx-font-size: 72px;
+    -fx-font-weight: 300;
+    -fx-line-spacing: 8px;
+
+    /* Clean white with subtle gradient */
+    -fx-text-fill: linear-gradient(
+        to bottom,
+        #ffffff,
+        #e0e6ff
+    );
+
+    /* Soft glow effect */
+    -fx-effect: dropshadow(gaussian, rgba(100,140,255,0.4), 30, 0.5, 0, 2);
+    -fx-letter-spacing: -1px;
+}
+
+/* ============================
+   SUBTITLE TEXT (Simplified Asset...)
+   ============================ */
+.subtitle-text {
+    -fx-font-family: "Segoe UI Light", "Helvetica Neue Light", "Arial";
+    -fx-font-size: 20px;
+    -fx-text-fill: rgba(180,190,220,0.75);
+    -fx-font-weight: 300;
+    -fx-line-spacing: 4px;
+}
+
+/* ============================
+   GET STARTED BUTTON
+   ============================ */
+.get-started-button {
+    -fx-background-color: 
+        linear-gradient(
+            to bottom,
+            rgba(90,110,255,0.9),
+            rgba(60,80,220,0.9)
+        );
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-family: "Segoe UI Semibold", "Arial";
+    -fx-font-weight: 600;
+    -fx-padding: 16 40 16 40;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    
+    /* Button glow */
+    -fx-effect: dropshadow(gaussian, rgba(90,120,255,0.6), 25, 0.6, 0, 4);
+}
+
+.get-started-button:hover {
+    -fx-background-color: 
+        linear-gradient(
+            to bottom,
+            rgba(110,130,255,1),
+            rgba(80,100,240,1)
+        );
+    -fx-effect: dropshadow(gaussian, rgba(110,140,255,0.8), 35, 0.7, 0, 6);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.get-started-button:pressed {
+    -fx-background-color: 
+        linear-gradient(
+            to bottom,
+            rgba(70,90,220,1),
+            rgba(50,70,200,1)
+        );
+    -fx-effect: dropshadow(gaussian, rgba(90,120,255,0.4), 15, 0.4, 0, 2);
+}
+
+/* ============================
+   ARROW ICON IN BUTTON
+   ============================ */
+.button-arrow {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+/* ============================
+   FEATURE CARDS (Asset Swapping, etc.)
+   ============================ */
+.feature-card {
+    -fx-background-color: rgba(20,25,45,0.6);
+    -fx-background-radius: 12;
+    -fx-padding: 24;
+    -fx-border-color: rgba(255,255,255,0.08);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 20, 0.3, 0, 8);
+}
+
+.feature-title {
+    -fx-font-family: "Segoe UI Semibold", "Arial";
+    -fx-font-size: 20px;
+    -fx-text-fill: rgba(240,245,255,0.95);
+    -fx-font-weight: 600;
+}
+
+.feature-description {
+    -fx-font-family: "Segoe UI Light", "Arial";
+    -fx-font-size: 14px;
+    -fx-text-fill: rgba(160,170,200,0.7);
+    -fx-line-spacing: 2px;
+}
+
+/* ============================
+   FEATURE ICONS
+   ============================ */
+.feature-icon {
+    -fx-font-size: 28px;
+    -fx-text-fill: rgba(120,150,255,0.9);
+    -fx-effect: dropshadow(gaussian, rgba(100,140,255,0.5), 15, 0.5, 0, 0);
+}
+
+/* ============================
+   3D FLOATING ELEMENTS CONTAINER
+   ============================ */
+.floating-visual {
+    -fx-effect: 
+        dropshadow(gaussian, rgba(90,120,255,0.4), 40, 0.6, 0, 15),
+        dropshadow(gaussian, rgba(140,160,255,0.3), 80, 0.4, 0, 30);
+}
+
+/* ============================
+   PULSE ANIMATION FOR CONTINUE TEXT
+   ============================ */
+.continue-text {
+    -fx-font-size: 16px;
+    -fx-font-family: "Segoe UI Light", "Arial";
+    -fx-text-fill: rgba(180,190,220,0.6);
+    -fx-effect: dropshadow(gaussian, rgba(120,140,255,0.3), 15, 0.3, 0, 2);
+}
+
+/* ============================
+   NAVIGATION MENU
+   ============================ */
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(200,210,240,0.8);
+    -fx-font-size: 15px;
+    -fx-font-family: "Segoe UI", "Arial";
+    -fx-padding: 12 20 12 20;
+    -fx-cursor: hand;
+}
+
+.nav-button:hover {
+    -fx-text-fill: rgba(255,255,255,1);
+    -fx-effect: dropshadow(gaussian, rgba(120,140,255,0.4), 10, 0.5, 0, 0);
+}
+
+.contact-button {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(200,210,240,0.3);
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+    -fx-text-fill: rgba(220,230,255,0.9);
+    -fx-font-size: 15px;
+    -fx-font-family: "Segoe UI", "Arial";
+    -fx-padding: 10 24 10 24;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.contact-button:hover {
+    -fx-background-color: rgba(90,110,255,0.15);
+    -fx-border-color: rgba(120,150,255,0.6);
+    -fx-text-fill: white;
+}

@@ -1,0 +1,194 @@
+/* Root styling with dark background */
+.root {
+    -fx-font-family: "Poppins";
+    -fx-background-color: linear-gradient(to bottom right, #0a0a0a, #1a1a1a);
+}
+
+.parent {
+    -fx-background-color: linear-gradient(to bottom right, #0a0a0a, #1a1a1a);
+}
+
+.button {
+    -fx-cursor: hand;
+}
+
+/* Checkbox styling */
+.check-box:selected .mark {
+    -fx-background-color: #4a9eff;
+}
+
+.check-box {
+    -fx-text-fill: #e0e0e0;
+}
+
+/* All Labels - Dark theme text color */
+.label {
+    -fx-text-fill: #e0e0e0;
+}
+
+/* Text Fields - Dark background with light text */
+.text-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e0e0e0;
+    -fx-prompt-text-fill: #888888;
+    -fx-border-width: 0 0 2 0;
+    -fx-border-color: transparent transparent #4a9eff transparent;
+}
+
+.text-field:focused {
+    -fx-border-color: transparent transparent #6ab8ff transparent;
+}
+
+/* Password Fields - Dark background with light text */
+.password-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e0e0e0;
+    -fx-prompt-text-fill: #888888;
+    -fx-border-width: 0 0 2 0;
+    -fx-border-color: transparent transparent #4a9eff transparent;
+}
+
+.password-field:focused {
+    -fx-border-color: transparent transparent #6ab8ff transparent;
+}
+
+/* Panes - Dark background */
+#rightpane {
+    -fx-background-color: #1a1a1a;
+}
+
+#rightpane1 {
+    -fx-background-color: #1a1a1a;
+}
+
+#forgotPane {
+    -fx-background-color: #1a1a1a;
+}
+
+/* Left pane gradients - darker version */
+#leftpane {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #1a6b67 0%, #1e5a7a 31%, #2d1b3d 75%);
+}
+
+#leftpane1 {
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #1a6b67 0%, #1e5a7a 31%, #2d1b3d 75%);
+}
+
+/* Go to Registration Button */
+#gotoRegBtn {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #2d1b3d 0%, #1e5a7a 50%, #1a6b67 100%);
+    -fx-text-fill: white;
+    -fx-background-radius: 15;
+}
+
+#gotoRegBtn:hover {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #3d2650 0%, #2a7a9e 50%, #268a85 100%);
+    -fx-cursor: hand;
+}
+
+#gotoRegBtn:pressed {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #1f0f2a 0%, #0f3a4f 50%, #0d4441 100%);
+}
+
+/* Change Password Button */
+#changePass {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #2d1b3d 0%, #1e5a7a 50%, #1a6b67 100%);
+    -fx-text-fill: white;
+    -fx-background-radius: 15;
+}
+
+#changePass:hover {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #3d2650 0%, #2a7a9e 50%, #268a85 100%);
+    -fx-cursor: hand;
+}
+
+#changePass:pressed {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #1f0f2a 0%, #0f3a4f 50%, #0d4441 100%);
+}
+
+/* Login Button */
+#loginBtn {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #2d1b3d 0%, #1e5a7a 50%, #1a6b67 100%);
+    -fx-text-fill: white;
+    -fx-background-radius: 15;
+}
+
+#loginBtn:hover {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #3d2650 0%, #2a7a9e 50%, #268a85 100%);
+    -fx-cursor: hand;
+}
+
+#loginBtn:pressed {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #1f0f2a 0%, #0f3a4f 50%, #0d4441 100%);
+}
+
+/* Go to Login Button */
+#gotoLoginBtn {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #2d1b3d 0%, #1e5a7a 50%, #1a6b67 100%);
+    -fx-text-fill: white;
+    -fx-background-radius: 15;
+}
+
+#gotoLoginBtn:hover {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #3d2650 0%, #2a7a9e 50%, #268a85 100%);
+    -fx-cursor: hand;
+}
+
+#gotoLoginBtn:pressed {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #1f0f2a 0%, #0f3a4f 50%, #0d4441 100%);
+}
+
+/* Registration Button */
+#regBtn {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #2d1b3d 0%, #1e5a7a 50%, #1a6b67 100%);
+    -fx-text-fill: white;
+    -fx-background-radius: 15;
+}
+
+#regBtn:hover {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #3d2650 0%, #2a7a9e 50%, #268a85 100%);
+    -fx-cursor: hand;
+}
+
+#regBtn:pressed {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #1f0f2a 0%, #0f3a4f 50%, #0d4441 100%);
+}
+
+/* Go Back Button */
+#Goback {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #2d1b3d 0%, #1e5a7a 50%, #1a6b67 100%);
+    -fx-text-fill: white;
+    -fx-background-radius: 15;
+}
+
+#Goback:hover {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #3d2650 0%, #2a7a9e 50%, #268a85 100%);
+    -fx-cursor: hand;
+}
+
+#Goback:pressed {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #1f0f2a 0%, #0f3a4f 50%, #0d4441 100%);
+}
+
+/* Forgot Password Button */
+#forgotPassBtn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #4a9eff;
+}
+
+#forgotPassBtn:hover {
+    -fx-text-fill: #6ab8ff;
+    -fx-cursor: hand;
+}
+
+/* Error Labels remain RED */
+#userError,
+#passError,
+#userRegError,
+#passRegError,
+#emailRegError,
+#termsError,
+#userError1,
+#passMismatch {
+    -fx-text-fill: #ff4444;
+}

@@ -153,4 +153,8 @@ public class ProgressReportWindow {
         alert.setContentText(message);
         alert.showAndWait();
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 6025839 (Initial commit)

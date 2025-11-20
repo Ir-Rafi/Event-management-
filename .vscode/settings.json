@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
     "java.project.sourcePaths": ["src"],
     "java.project.outputPath": "bin",
@@ -7,3 +8,14 @@
         "/Users/macbookair/Desktop/mysql-connector-j-9.5.0.jar"
     ]
 }
+=======
+{
+    "java.project.sourcePaths": ["src"],
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "/Users/macbookair/Downloads/javafx-sdk-24.0.2/lib/**/*.jar",
+        "/Users/macbookair/Desktop/mysql-connector-j-9.5.0.jar"
+    ]
+}
+>>>>>>> 6025839 (Initial commit)

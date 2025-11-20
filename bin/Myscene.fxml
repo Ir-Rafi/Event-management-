@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="Controller"
+           styleClass="root-box">
+
+    <!-- Main Container -->
+    <VBox alignment="TOP_LEFT" spacing="0">
+        
+        <!-- Top Navigation Bar -->
+        <HBox alignment="CENTER_LEFT" spacing="40" styleClass="nav-bar">
+            <padding>
+                <Insets top="20" bottom="40" left="40" right="40"/>
+            </padding>
+            
+            <!-- Logo -->
+            <Label text="ChainFund" style="-fx-font-size: 24px; -fx-text-fill: white; -fx-font-weight: bold;"/>
+            
+            <!-- Spacer -->
+            <Region HBox.hgrow="ALWAYS"/>
+            
+            <!-- Navigation Links -->
+            <Button text="Home" styleClass="nav-button"/>
+            <Button text="Why Us" styleClass="nav-button"/>
+            <Button text="Platform" styleClass="nav-button"/>
+            <Button text="Assets" styleClass="nav-button"/>
+            <Button text="Blog" styleClass="nav-button"/>
+            
+            <!-- Contact Button -->
+            <Button text="Contact Us" styleClass="contact-button"/>
+        </HBox>
+        
+        <!-- Main Content Area -->
+        <HBox alignment="CENTER_LEFT" spacing="80" VBox.vgrow="ALWAYS">
+            <padding>
+                <Insets top="60" bottom="100" left="60" right="60"/>
+            </padding>
+            
+            <!-- Left Content -->
+            <VBox alignment="TOP_LEFT" spacing="35" maxWidth="680">
+                
+                <!-- Small header -->
+                <Label text="150+ organizations" styleClass="LeftWelcomeLabel"/>
+                
+                <!-- Main Headline -->
+                <VBox spacing="8">
+                    <Label text="Investing with us" styleClass="RightPlan-it"/>
+                    <Label text="Beyond Boundaries" styleClass="RightPlan-it"/>
+                </VBox>
+                
+                <!-- Subtitle -->
+                <VBox spacing="4">
+                    <Label text="Simplified Asset Fractionalization with" styleClass="subtitle-text"/>
+                    <Label text="Unrivaled Market Access via ChainFund" styleClass="subtitle-text"/>
+                </VBox>
+                
+                <!-- Get Started Button -->
+                <HBox alignment="CENTER_LEFT" spacing="0">
+                    <padding>
+                        <Insets top="20"/>
+                    </padding>
+                    <Button styleClass="get-started-button" onAction="#handleGetStarted">
+                        <graphic>
+                            <HBox alignment="CENTER" spacing="10">
+                                <Label text="Get Started" style="-fx-text-fill: white;"/>
+                                <Label text="→" styleClass="button-arrow"/>
+                            </HBox>
+                        </graphic>
+                    </Button>
+                </HBox>
+                
+                <!-- Continue Text for Key Press -->
+                <Text fx:id="continueText" text="Press any key to continue" style="-fx-font-size: 16px; -fx-fill: white;"/>
+                
+            </VBox>
+            
+            <!-- Right Visual (Placeholder for 3D graphics) -->
+            <Region prefWidth="400" prefHeight="500" styleClass="floating-visual"/>
+            
+        </HBox>
+        
+        <!-- Bottom Feature Cards -->
+        <HBox alignment="CENTER" spacing="30">
+            <padding>
+                <Insets bottom="50" left="60" right="60"/>
+            </padding>
+            
+            <!-- Asset Swapping Card -->
+            <VBox styleClass="feature-card" spacing="12" prefWidth="320">
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Label text="↔" styleClass="feature-icon"/>
+                    <Label text="Asset Swapping" styleClass="feature-title"/>
+                </HBox>
+                <VBox spacing="4">
+                    <Label text="Direct peer-to-peer transactions" styleClass="feature-description"/>
+                    <Label text="with real-world assets" styleClass="feature-description"/>
+                </VBox>
+            </VBox>
+            
+            <!-- Shared Ownership Card -->
+            <VBox styleClass="feature-card" spacing="12" prefWidth="320">
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Label text="⊞" styleClass="feature-icon"/>
+                    <Label text="Shared Ownership" styleClass="feature-title"/>
+                </HBox>
+                <VBox spacing="4">
+                    <Label text="Shared ownership through" styleClass="feature-description"/>
+                    <Label text="fractionalization of physical assets" styleClass="feature-description"/>
+                </VBox>
+            </VBox>
+            
+            <!-- Carbon Integrity Card -->
+            <VBox styleClass="feature-card" spacing="12" prefWidth="320">
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Label text="◉" styleClass="feature-icon"/>
+                    <Label text="Carbon Integrity" styleClass="feature-title"/>
+                </HBox>
+                <VBox spacing="4">
+                    <Label text="Reliable carbon credit transactions" styleClass="feature-description"/>
+                    <Label text="backed by audit trails" styleClass="feature-description"/>
+                </VBox>
+            </VBox>
+            
+        </HBox>
+        
+    </VBox>
+    
+</StackPane>

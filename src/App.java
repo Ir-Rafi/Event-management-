@@ -103,6 +103,7 @@ public class App extends Application {
         stage.show();
     }
 
+<<<<<<< HEAD
     private VBox createEventCard(String eventName, String role, Stage stage, Scene eventsScene) {
         VBox card = new VBox(10);
         card.setAlignment(Pos.CENTER);
@@ -142,3 +143,9 @@ public class App extends Application {
         launch();
     }
 }
+=======
+    public static void main(String[] args) {
+        launch();
+    }
+}
+>>>>>>> 6025839 (Initial commit)

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml" 
+           fx:controller="FormController"
+           stylesheets="@form.css"
+           styleClass="root">
+
+    <AnchorPane fx:id="rootPane" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" 
+                AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+
+        <!-- PAGE 1 -->
+        <VBox fx:id="page1" alignment="TOP_CENTER" spacing="30"
+              AnchorPane.topAnchor="0" AnchorPane.rightAnchor="0" 
+              AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0">
+
+            <padding>
+                <Insets top="80" right="80" bottom="80" left="80"/>
+            </padding>
+
+            <Label text="What do you want to use PlanIt! for?" styleClass="title"/>
+            <Label text="Used to personalize your PlanIt! experience." styleClass="subtitle"/>
+            <Label text="Choose one or more" styleClass="subtitle"/>
+
+            <VBox alignment="CENTER" spacing="18" fillWidth="false">
+                <ToggleButton text="Communication strategy planning" styleClass="toggle-button"/>
+                <ToggleButton text="Event Planning" styleClass="toggle-button"/>
+                <ToggleButton text="Institutional Program" styleClass="toggle-button"/>
+                <ToggleButton text="Seminar" styleClass="toggle-button"/>
+                <ToggleButton text="Competition Arrangement" styleClass="toggle-button"/>
+                <ToggleButton text="Arranging Family Program" styleClass="toggle-button"/>
+                <ToggleButton text="Business Program" styleClass="toggle-button"/>
+                <ToggleButton text="Other" styleClass="toggle-button"/>   
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Button fx:id="continue1" text="Continue" styleClass="continue-btn"/>
+            
+            <Label text="page 1 of 3" styleClass="subtitle" 
+                   style="-fx-text-fill: rgba(160,170,200,0.5); -fx-font-size: 13px;"/>
+        </VBox>
+
+        <!-- PAGE 2 -->
+        <VBox fx:id="page2" alignment="TOP_CENTER" spacing="30"
+              AnchorPane.topAnchor="0" AnchorPane.rightAnchor="0" 
+              AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
+              visible="false">
+
+            <padding>
+                <Insets top="80" right="80" bottom="80" left="80"/>
+            </padding>
+
+            <Label text="What function best describes your work?" styleClass="title"/>
+            <Label text="Choose one or more" styleClass="subtitle"/>
+
+            <VBox alignment="CENTER" spacing="18" fillWidth="false">
+                <ToggleButton text="Administrative Assistant" styleClass="toggle-button"/>
+                <ToggleButton text="Communications" styleClass="toggle-button"/>
+                <ToggleButton text="Customer Experience" styleClass="toggle-button"/>
+                <ToggleButton text="Data or Analytics" styleClass="toggle-button"/>
+                <ToggleButton text="Management" styleClass="toggle-button"/>
+                <ToggleButton text="Event Planning" styleClass="toggle-button"/>
+                <ToggleButton text="Just Exploring" styleClass="toggle-button"/>
+                <ToggleButton text="Other" styleClass="toggle-button"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Button fx:id="continue2" text="Continue" styleClass="continue-btn"/>
+            
+            <Label text="page 2 of 3" styleClass="subtitle" 
+                   style="-fx-text-fill: rgba(160,170,200,0.5); -fx-font-size: 13px;"/>
+        </VBox>
+
+        <!-- PAGE 3 -->
+        <VBox fx:id="page3" alignment="TOP_CENTER" spacing="30"
+              AnchorPane.topAnchor="0" AnchorPane.rightAnchor="0" 
+              AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
+              visible="false">
+
+            <padding>
+                <Insets top="80" right="80" bottom="80" left="80"/>
+            </padding>
+
+            <Label text="What's your primary role?" styleClass="title"/>
+            <Label text="Choose one or more" styleClass="subtitle"/>
+
+            <VBox alignment="CENTER" spacing="18" fillWidth="false">
+                <ToggleButton text="Team member / Individual contributor" styleClass="toggle-button"/>
+                <ToggleButton text="Manager" styleClass="toggle-button"/>
+                <ToggleButton text="Director" styleClass="toggle-button"/>
+                <ToggleButton text="Student" styleClass="toggle-button"/>
+                <ToggleButton text="Executive" styleClass="toggle-button"/>
+                <ToggleButton text="Teacher" styleClass="toggle-button"/>
+                <ToggleButton text="Government Employee" styleClass="toggle-button"/>
+                <ToggleButton text="Other" styleClass="toggle-button"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Button fx:id="continue3" text="Finish" styleClass="continue-btn"/>
+            
+            <Label text="page 3 of 3" styleClass="subtitle" 
+                   style="-fx-text-fill: rgba(160,170,200,0.5); -fx-font-size: 13px;"/>
+        </VBox>
+
+    </AnchorPane>
+
+</StackPane>
