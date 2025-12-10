@@ -295,7 +295,10 @@ public class login_controller {
                                 // Get current stage (login stage)
                                 Stage stage = (Stage) loginBtn.getScene().getWindow();
                                 stage.setScene(scene);
-                                stage.setMaximized(true);
+                                //stage.setMaximized(true);
+                                stage.setFullScreen(true);
+stage.setFullScreenExitHint("");
+
                                 stage.show();
 
                                 // Close loading window
@@ -561,4 +564,3 @@ public class login_controller {
 
   
 }
-

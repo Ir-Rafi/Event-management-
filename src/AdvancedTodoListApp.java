@@ -7,10 +7,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
+
 
 public class AdvancedTodoListApp extends Application {
 
@@ -40,12 +42,15 @@ public class AdvancedTodoListApp extends Application {
         VBox mainContent = createMainContent();
         root.setCenter(mainContent);
 
-        Scene scene = new Scene(root, 900, 700);
+        Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("todoListStyle.css").toExternalForm());
 
         stage.setTitle("Advanced To-Do List");
         stage.setScene(scene);
-        stage.setMaximized(true);
+        //stage.setMaximized(true);
+        stage.setFullScreen(true);
+stage.setFullScreenExitHint("");
+
         stage.show();
     }
 
@@ -70,6 +75,8 @@ public class AdvancedTodoListApp extends Application {
         backBtn.setOnAction(e -> {
             if (organizerScene != null) {
                 stage.setScene(organizerScene);
+                 stage.setFullScreen(true);
+stage.setFullScreenExitHint("");
             } else {
                 // fallback: show an alert
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);

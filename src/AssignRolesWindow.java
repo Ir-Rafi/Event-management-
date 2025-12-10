@@ -73,7 +73,7 @@ public class AssignRolesWindow {
 
         layout.getChildren().addAll(title, scrollPane, closeBtn);
 
-        Scene scene = new Scene(layout, 920, 720);
+        Scene scene = new Scene(layout, 1920, 1080);
         window.setScene(scene);
         window.show();
     }

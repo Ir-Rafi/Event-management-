@@ -21,7 +21,7 @@ public class SubOrganizerView extends after_login {
         this.subOrganizerName = subOrganizerName;
         loadTasks();
 
-        VBox layout = new VBox(25);
+        VBox layout = new VBox(30);
         layout.setPadding(new Insets(30));
         layout.setAlignment(Pos.TOP_CENTER);
         layout.setStyle("-fx-background-color: linear-gradient(to bottom, #1E1E2F, #2C2C3E);");
@@ -45,7 +45,12 @@ public class SubOrganizerView extends after_login {
             -fx-background-radius: 8;
             -fx-padding: 8 20 8 20;
         """);
-        backBtn.setOnAction(e -> stage.setScene(eventsScene));
+        backBtn.setOnAction(e -> {
+    stage.setScene(eventsScene);
+    stage.setFullScreen(true);
+    stage.setFullScreenExitHint("");
+});
+
         Button chatBtn = new Button("Open Chat");
         applyHoverEffect(chatBtn,          "#7E57C2", "#5E35B1");
         chatBtn.setOnAction(e -> {
@@ -55,9 +60,12 @@ public class SubOrganizerView extends after_login {
 
         layout.getChildren().addAll(title, scrollPane, chatBtn, backBtn);
 
-        Scene scene = new Scene(layout, 800, 650);
+        Scene scene = new Scene(layout, 1920, 1080);
         stage.setScene(scene);
-        stage.setMaximized(true);
+        //stage.setMaximized(true);
+        stage.setFullScreen(true);
+stage.setFullScreenExitHint("");
+
     }
 
     private void refreshTasks() {

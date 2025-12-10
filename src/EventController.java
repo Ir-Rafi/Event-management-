@@ -270,6 +270,7 @@ for (OrganizerData orgData : organizersList) {
 
         // Create event
         EventData event = new EventData(
+            0,
             eventNameField.getText().trim(),
             startDate,endDate,
             startTimeCombo.getValue(),
@@ -338,7 +339,9 @@ insertEventIntoDatabase(event);
             formStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
             formStage.initOwner(parentStage);
             formStage.setScene(new javafx.scene.Scene(root));
-            formStage.setResizable(false);
+            formStage.setFullScreen(true);  // <-- hides window borders
+            formStage.setFullScreenExitHint("");
+formStage.show();
             formStage.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -386,15 +389,17 @@ insertEventIntoDatabase(event);
 
     // Event data holder
      public static class EventData implements Serializable {
+        int id;
         String name, startTime, endTime, location, description, color, showMe, visibility;
         LocalDate date;
             LocalDate endDate;       // calculated end date
     long durationDays;       // calculated duration
         List<Organizer> organizers;
         File attachedFilePath, eventImagePath;
-        public EventData(String name, LocalDate date, LocalDate enDate, String startTime, String endTime, 
+        public EventData(int id, String name, LocalDate date, LocalDate enDate, String startTime, String endTime, 
                  String location, String description, List<Organizer> organizers,
                  String color, String showMe, String visibility, File attachedFile, File eventImage, long durationDays) {
+    this.id = id;
     this.name = name;
     this.date = date;
     this.endDate = enDate;  // fixed
@@ -578,6 +583,7 @@ public static List<EventData> loadEventsFromDB() {
             }
 
             events.add(new EventData(
+                    eventId,
                     name,
                     startDate,
                     endDate,
@@ -706,7 +712,7 @@ public static List<EventData> loadUserEvents(String username, int organizerId) {
             }
 
             events.add(new EventData(
-                    name, startDate, endDate, startTime, endTime,
+                    eventId, name, startDate, endDate, startTime, endTime,
                     location, description, organizers,
                     color, showMe, visibility,
                     attachedFilePath != null ? new File(attachedFilePath) : null,
@@ -722,6 +728,23 @@ public static List<EventData> loadUserEvents(String username, int organizerId) {
     return events;
 }
 
+public static boolean deleteEvent(int eventId) {
+    String sql = "DELETE FROM events WHERE event_id = ?";
+    
+    try (Connection conn = DriverManager.getConnection(
+            "jdbc:mysql://ununqd8usvy0wouy:GmDEehgTBjzyuPRuA8i8@b1gtvncwynmgz6qozokc-mysql.services.clever-cloud.com:3306/b1gtvncwynmgz6qozokc",
+            "ununqd8usvy0wouy", "GmDEehgTBjzyuPRuA8i8");
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        
+        ps.setInt(1, eventId);
+        int rowsAffected = ps.executeUpdate();
+        return rowsAffected > 0;
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
+    }
+}
 
 
 }

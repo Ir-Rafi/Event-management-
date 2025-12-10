@@ -348,7 +348,7 @@
                         <Font name="SansSerif Bold Italic" size="19.0" />
                     </font>
                 </Label>
-                <PasswordField fx:id="forgotPass" alignment="CENTER" layoutX="76.0" layoutY="339.0" prefHeight="27.0" prefWidth="534.0" promptText="New Password" style="-fx-background-color: transparent; -fx-text-fill: #1f3ccc; -fx-border-width: 0 0 2 0; -fx-border-color: transparent transparent #1f3ccc transparent;">
+                <PasswordField fx:id="forgotPass" alignment="CENTER" layoutX="76.0" layoutY="339.0" prefHeight="27.0" prefWidth="534.0" promptText="E-mail" style="-fx-background-color: transparent; -fx-text-fill: #1f3ccc; -fx-border-width: 0 0 2 0; -fx-border-color: transparent transparent #1f3ccc transparent;">
                     <font>
                         <Font name="SansSerif Regular" size="20.0" />
                     </font>
@@ -358,7 +358,7 @@
                         <Font name="SansSerif Bold" size="24.0" />
                     </font>
                 </Button>
-                <PasswordField fx:id="ConfiirmPass" alignment="CENTER" layoutX="77.0" layoutY="436.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="534.0" promptText="Confirm New Password" style="-fx-background-color: transparent; -fx-text-fill: #1f3ccc; -fx-border-width: 0 0 2 0; -fx-border-color: transparent transparent #1f3ccc transparent;">
+                <PasswordField fx:id="ConfiirmPass" alignment="CENTER" layoutX="77.0" layoutY="436.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="534.0" promptText="New Password" style="-fx-background-color: transparent; -fx-text-fill: #1f3ccc; -fx-border-width: 0 0 2 0; -fx-border-color: transparent transparent #1f3ccc transparent;">
                     <font>
                         <Font name="SansSerif Regular" size="20.0" />
                     </font>
