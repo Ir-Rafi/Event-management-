@@ -1,12 +1,15 @@
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.geometry.Insets;
 import java.time.temporal.ChronoUnit;
@@ -17,7 +20,6 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,23 +28,40 @@ import java.util.ResourceBundle;
 
 public class EventController implements Initializable {
 
-    @FXML private TextField eventNameField;
-    @FXML private DatePicker eventDatePicker;
-    @FXML private ComboBox<String> endsAfterCombo;
-    @FXML private ComboBox<String> startTimeCombo;
-    @FXML private ComboBox<String> endTimeCombo;
-    @FXML private ComboBox<String> locationCombo;
-    @FXML private TextArea eventDescriptionArea;
-    @FXML private VBox organizersContainer;
-    @FXML private HBox colorContainer;
-    @FXML private Button closeButton;
-    @FXML private Button attachFileButton;
-    @FXML private Button addImageButton;
-    @FXML private Button addOrganizerButton;
-    @FXML private Button cancelButton;
-    @FXML private Button createButton;
-    @FXML private ToggleGroup showMeGroup;
-    @FXML private ToggleGroup visibilityGroup;
+    @FXML
+    private TextField eventNameField;
+    @FXML
+    private DatePicker eventDatePicker;
+    @FXML
+    private ComboBox<String> endsAfterCombo;
+    @FXML
+    private ComboBox<String> startTimeCombo;
+    @FXML
+    private ComboBox<String> endTimeCombo;
+    @FXML
+    private ComboBox<String> locationCombo;
+    @FXML
+    private TextArea eventDescriptionArea;
+    @FXML
+    private VBox organizersContainer;
+    @FXML
+    private HBox colorContainer;
+    @FXML
+    private Button closeButton;
+    @FXML
+    private Button attachFileButton;
+    @FXML
+    private Button addImageButton;
+    @FXML
+    private Button addOrganizerButton;
+    @FXML
+    private Button cancelButton;
+    @FXML
+    private Button createButton;
+    @FXML
+    private ToggleGroup showMeGroup;
+    @FXML
+    private ToggleGroup visibilityGroup;
 
     private String selectedColor = "#6366F1";
     private List<OrganizerData> organizersList = new ArrayList<>();
@@ -73,15 +92,14 @@ public class EventController implements Initializable {
 
     private void initializeEndsAfter() {
         endsAfterCombo.getItems().addAll(
-            "Same Day", "1 Day", "2 Days", "3 Days", "1 Week", "2 Weeks", "Custom"
-        );
+                "Same Day", "1 Day", "2 Days", "3 Days", "1 Week", "2 Weeks", "Custom");
         endsAfterCombo.setValue("Same Day");
     }
 
     private void initializeColorPicker() {
         String[] colors = {
-            "#6366F1", "#06B6D4", "#10B981", "#F59E0B", 
-            "#F97316", "#EF4444", "#EC4899", "#8B5CF6"
+                "#6366F1", "#06B6D4", "#10B981", "#F59E0B",
+                "#F97316", "#EF4444", "#EC4899", "#8B5CF6"
         };
 
         for (String color : colors) {
@@ -90,14 +108,14 @@ public class EventController implements Initializable {
             colorCircle.setStroke(Color.web("#E5E7EB"));
             colorCircle.setStrokeWidth(2);
             colorCircle.getStyleClass().add("color-circle");
-            
+
             colorCircle.setOnMouseClicked(e -> {
                 selectedColor = color;
                 updateColorSelection(colorCircle);
             });
-            
+
             colorContainer.getChildren().add(colorCircle);
-            
+
             if (color.equals("#6366F1")) {
                 colorCircle.setStrokeWidth(3);
                 colorCircle.setStroke(Color.web("#4F46E5"));
@@ -113,7 +131,7 @@ public class EventController implements Initializable {
                 circle.setStroke(Color.web("#E5E7EB"));
             }
         });
-        
+
         selectedCircle.setStrokeWidth(3);
         selectedCircle.setStroke(Color.web("#4F46E5"));
     }
@@ -124,7 +142,7 @@ public class EventController implements Initializable {
         organizerCard.getStyleClass().add("organizer-card");
         organizerCard.setPadding(new Insets(15));
         organizerCard.setSpacing(10);
-        
+
         // Organizer Name
         VBox nameBox = new VBox(5);
         Label nameLabel = new Label("Organizer Name");
@@ -133,7 +151,7 @@ public class EventController implements Initializable {
         nameField.setPromptText("Enter organizer name");
         nameField.getStyleClass().add("organizer-field");
         nameBox.getChildren().addAll(nameLabel, nameField);
-        
+
         // Registration Code
         VBox codeBox = new VBox(5);
         Label codeLabel = new Label("Registration Code");
@@ -142,7 +160,7 @@ public class EventController implements Initializable {
         codeField.setPromptText("Enter registration code");
         codeField.getStyleClass().add("organizer-field");
         codeBox.getChildren().addAll(codeLabel, codeField);
-        
+
         // Remove Button
         Button removeBtn = new Button("✕ Remove");
         removeBtn.getStyleClass().add("remove-organizer-btn");
@@ -150,10 +168,10 @@ public class EventController implements Initializable {
             organizersContainer.getChildren().remove(organizerCard);
             organizersList.removeIf(org -> org.nameField == nameField);
         });
-        
+
         organizerCard.getChildren().addAll(nameBox, codeBox, removeBtn);
         organizersContainer.getChildren().add(organizerCard);
-        
+
         organizersList.add(new OrganizerData(nameField, codeField));
     }
 
@@ -162,13 +180,12 @@ public class EventController implements Initializable {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Attach File");
         fileChooser.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("All Files", "*.*"),
-            new FileChooser.ExtensionFilter("PDF Files", "*.pdf"),
-            new FileChooser.ExtensionFilter("Documents", "*.doc", "*.docx")
-        );
-        
+                new FileChooser.ExtensionFilter("All Files", "*.*"),
+                new FileChooser.ExtensionFilter("PDF Files", "*.pdf"),
+                new FileChooser.ExtensionFilter("Documents", "*.doc", "*.docx"));
+
         attachedFile = fileChooser.showOpenDialog(attachFileButton.getScene().getWindow());
-        
+
         if (attachedFile != null) {
             showAlert("File Attached", "File: " + attachedFile.getName(), Alert.AlertType.INFORMATION);
         }
@@ -179,11 +196,10 @@ public class EventController implements Initializable {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Add Event Image");
         fileChooser.getExtensionFilters().add(
-            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
-        );
-        
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
+
         eventImage = fileChooser.showOpenDialog(addImageButton.getScene().getWindow());
-        
+
         if (eventImage != null) {
             showAlert("Image Added", "Image: " + eventImage.getName(), Alert.AlertType.INFORMATION);
         }
@@ -196,124 +212,174 @@ public class EventController implements Initializable {
             showAlert("Validation Error", "Please enter an event name", Alert.AlertType.ERROR);
             return;
         }
-        
+
         if (eventDatePicker.getValue() == null) {
             showAlert("Validation Error", "Please select an event date", Alert.AlertType.ERROR);
             return;
         }
-        LocalDate startDate = eventDatePicker.getValue();
-String endsAfter = endsAfterCombo.getValue();
 
-// Calculate end date and duration
-LocalDate endDate = calculateEndDate(startDate, endsAfter);
-long durationDays = calculateDurationDays(startDate, endDate);
+        LocalDate startDate = eventDatePicker.getValue();
+        String endsAfter = endsAfterCombo.getValue();
+
+        // Calculate end date and duration
+        LocalDate endDate = calculateEndDate(startDate, endsAfter);
+        long durationDays = calculateDurationDays(startDate, endDate);
 
         if (locationCombo.getValue() == null) {
             showAlert("Validation Error", "Please select a location", Alert.AlertType.ERROR);
             return;
         }
 
-String currentUsername = Session.getUsername();
-    int currentOrganizerId = Session.getOrganizerId();
+        String currentUsername = Session.getUsername();
+        int currentOrganizerId = Session.getOrganizerId();
 
-    if (currentUsername == null || currentOrganizerId == 0) {
-        showAlert("Authentication Error", "You must be logged in to create an event.", Alert.AlertType.ERROR);
-        return;
-    }
+        if (currentUsername == null || currentOrganizerId == 0) {
+            showAlert("Authentication Error", "You must be logged in to create an event.", Alert.AlertType.ERROR);
+            return;
+        }
 
+        // Collect organizers data before background task
+        List<OrganizerData> organizersDataCopy = new ArrayList<>();
+        for (OrganizerData orgData : organizersList) {
+            String name = orgData.nameField.getText().trim();
+            String codeText = orgData.codeField.getText().trim();
+            if (!name.isEmpty() && !codeText.isEmpty()) {
+                organizersDataCopy.add(new OrganizerData(
+                        new TextField(name),
+                        new TextField(codeText)));
+            }
+        }
 
-        
-        // Collect and validate organizers
-        List<Organizer> organizers = new ArrayList<>();
-         organizers.add(new Organizer(currentUsername, currentOrganizerId));
-        // ✅ Check booking ONCE for main organizer only
-if (!isPlaceBookedByOrganizer(
-        locationCombo.getValue(),
-        startDate,
-        endDate,
-        startTimeCombo.getValue(),
-        endTimeCombo.getValue(),
-        currentOrganizerId)) {
+        // Collect all form data
+        final String eventName = eventNameField.getText().trim();
+        final String location = locationCombo.getValue();
+        final String startTime = startTimeCombo.getValue();
+        final String endTime = endTimeCombo.getValue();
+        final String description = eventDescriptionArea.getText().trim();
+        final String showMe = ((RadioButton) showMeGroup.getSelectedToggle()).getText();
+        final String visibility = ((RadioButton) visibilityGroup.getSelectedToggle()).getText();
+        final File attachedFileCopy = attachedFile;
+        final File eventImageCopy = eventImage;
+        final String colorCopy = selectedColor;
 
-    showAlert("Booking Error",
-            "You cannot create this event. The place is not booked by you for the selected date/time range.",
-            Alert.AlertType.ERROR);
-    return;
-}
+        // Disable create button and show progress
+        createButton.setDisable(true);
 
-// ✅ Then process other organizers (sub-organizers)
-for (OrganizerData orgData : organizersList) {
-    String name = orgData.nameField.getText().trim();
-    String codeText = orgData.codeField.getText().trim();
+        // Create progress indicator
+        javafx.scene.control.ProgressIndicator progressIndicator = new javafx.scene.control.ProgressIndicator();
+        progressIndicator.setPrefSize(20, 20);
+        createButton.setGraphic(progressIndicator);
 
-    if (name.isEmpty() || codeText.isEmpty()) continue;
+        // Create animated dots timeline
+        final String[] dots = { "", ".", "..", "..." };
+        final int[] dotIndex = { 0 };
+        final String[] currentStatus = { "Creating" };
 
-    int code;
-    try {
-        code = Integer.parseInt(codeText);
-    } catch (NumberFormatException e) {
-        showAlert("Validation Error", "Organizer code must be a number!", Alert.AlertType.ERROR);
-        return;
-    }
+        javafx.animation.Timeline timeline = new javafx.animation.Timeline(
+                new javafx.animation.KeyFrame(javafx.util.Duration.millis(500), e -> {
+                    dotIndex[0] = (dotIndex[0] + 1) % dots.length;
+                    createButton.setText(currentStatus[0] + dots[dotIndex[0]]);
+                }));
+        timeline.setCycleCount(javafx.animation.Timeline.INDEFINITE);
+        timeline.play();
 
-    if (!isValidOrganizer(name, code)) {
-        showAlert("Validation Error", "Organizer " + name + " with ID " + code + " is invalid!", Alert.AlertType.ERROR);
-        return;
-    }
+        // Create background task
+        javafx.concurrent.Task<String> createEventTask = new javafx.concurrent.Task<String>() {
+            @Override
+            protected String call() throws Exception {
+                // 1. Check booking (this can take time)
+                updateMessage("Checking booking");
+                if (!isPlaceBookedByOrganizer(location, startDate, endDate, startTime, endTime, currentOrganizerId)) {
+                    throw new Exception("The place is not booked by you for the selected date/time range.");
+                }
 
-    boolean alreadyAdded = organizers.stream().anyMatch(o -> o.registrationCode == code);
-    if (!alreadyAdded) {
-        organizers.add(new Organizer(name, code));
-    }
-}
+                // 2. Validate organizers
+                updateMessage("Validating organizers");
+                List<Organizer> organizers = new ArrayList<>();
+                organizers.add(new Organizer(currentUsername, currentOrganizerId));
 
+                for (OrganizerData orgData : organizersDataCopy) {
+                    String name = orgData.nameField.getText().trim();
+                    String codeText = orgData.codeField.getText().trim();
 
+                    int code;
+                    try {
+                        code = Integer.parseInt(codeText);
+                    } catch (NumberFormatException e) {
+                        throw new Exception("Organizer code must be a number!");
+                    }
 
-        // Create event
-        EventData event = new EventData(
-            eventNameField.getText().trim(),
-            startDate,endDate,
-            startTimeCombo.getValue(),
-            endTimeCombo.getValue(),
-            locationCombo.getValue(),
-            eventDescriptionArea.getText().trim(),
-            organizers,
-            selectedColor,
-            ((RadioButton) showMeGroup.getSelectedToggle()).getText(),
-            ((RadioButton) visibilityGroup.getSelectedToggle()).getText(),
-            attachedFile,
-            eventImage,
-            durationDays
-        );
-        
-       
-        
-        String message = organizers.size() > 0 
-            ? "Event created successfully with " + organizers.size() + " organizer(s)!"
-            : "Event created successfully!";
+                    if (!isValidOrganizer(name, code)) {
+                        throw new Exception("Organizer " + name + " with ID " + code + " is invalid!");
+                    }
 
-        // Load existing events
+                    boolean alreadyAdded = organizers.stream().anyMatch(o -> o.registrationCode == code);
+                    if (!alreadyAdded) {
+                        organizers.add(new Organizer(name, code));
+                    }
+                }
 
+                // 3. Create event object
+                EventData event = new EventData(
+                        0, eventName, startDate, endDate, startTime, endTime,
+                        location, description, organizers, colorCopy, showMe, visibility,
+                        attachedFileCopy, eventImageCopy, durationDays);
 
+                // 4. Insert into database (this can take time)
+                updateMessage("Saving to database");
+                insertEventIntoDatabase(event);
 
-// Check if user is logged in
-if (currentUsername == null || currentOrganizerId == 0) {
-    showAlert("Authentication Error", "You must be logged in to create an event.", Alert.AlertType.ERROR);
-    return;
-}
+                return "Event created successfully with " + organizers.size() + " organizer(s)!";
+            }
+        };
 
+        // Update button text with animated dots based on task progress
+        createEventTask.messageProperty().addListener((obs, oldMsg, newMsg) -> {
+            if (newMsg != null) {
+                javafx.application.Platform.runLater(() -> {
+                    currentStatus[0] = newMsg;
+                    dotIndex[0] = 0; // Reset dots when status changes
+                });
+            }
+        });
 
+        // On success
+        createEventTask.setOnSucceeded(event -> {
+            timeline.stop();
+            createButton.setDisable(false);
+            createButton.setText("Create Event");
+            createButton.setGraphic(null);
 
+            String message = createEventTask.getValue();
+            showAlert("Success", message, Alert.AlertType.INFORMATION);
+            handleClose();
+        });
 
+        // On failure
+        createEventTask.setOnFailed(event -> {
+            timeline.stop();
+            createButton.setDisable(false);
+            createButton.setText("Create Event");
+            createButton.setGraphic(null);
 
+            Throwable exception = createEventTask.getException();
+            String errorMessage = exception != null ? exception.getMessage() : "Unknown error occurred";
 
-insertEventIntoDatabase(event);
+            if (errorMessage.contains("booking") || errorMessage.contains("booked")) {
+                showAlert("Booking Error", errorMessage, Alert.AlertType.ERROR);
+            } else if (errorMessage.contains("Organizer")) {
+                showAlert("Validation Error", errorMessage, Alert.AlertType.ERROR);
+            } else {
+                showAlert("Error", "Failed to create event: " + errorMessage, Alert.AlertType.ERROR);
+            }
 
+            exception.printStackTrace();
+        });
 
-
-            
-        showAlert("Success", message, Alert.AlertType.INFORMATION);
-        handleClose();
+        // Start the background thread
+        Thread thread = new Thread(createEventTask);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     @FXML
@@ -326,27 +392,39 @@ insertEventIntoDatabase(event);
         Stage stage = (Stage) closeButton.getScene().getWindow();
         stage.close();
     }
-    
+
     public static void openEventForm(Stage parentStage) {
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                EventController.class.getResource("CreateEventForm.fxml")
-            );
+            FXMLLoader loader = new FXMLLoader(
+                    EventController.class.getResource("CreateEventForm.fxml"));
             VBox root = loader.load();
-            
+
             Stage formStage = new Stage();
             formStage.setTitle("Create New Event");
-            formStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            formStage.initModality(Modality.APPLICATION_MODAL);
             formStage.initOwner(parentStage);
-            formStage.setScene(new javafx.scene.Scene(root));
-            formStage.setResizable(false);
+
+            // Same as your main stage
+            Scene scene = new Scene(root, 1366, 768);
+            formStage.setScene(scene);
+
+            // Optional: add stylesheet if needed
+            // scene.getStylesheets().add(
+            // EventController.class.getResource("style2.css").toExternalForm()
+            // );
+
+            // Match your main stage behavior
+            formStage.setFullScreen(true);
+            formStage.setFullScreenExitHint("");
+
             formStage.show();
+
         } catch (Exception e) {
             e.printStackTrace();
             showStaticAlert("Error", "Could not load event form: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
-    
+
     private static void showStaticAlert(String title, String message, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -386,275 +464,358 @@ insertEventIntoDatabase(event);
     }
 
     // Event data holder
-     static class EventData implements Serializable {
+    public static class EventData implements Serializable {
+        int id;
         String name, startTime, endTime, location, description, color, showMe, visibility;
         LocalDate date;
-            LocalDate endDate;       // calculated end date
-    long durationDays;       // calculated duration
+        LocalDate endDate; // calculated end date
+        long durationDays; // calculated duration
         List<Organizer> organizers;
         File attachedFilePath, eventImagePath;
-        public EventData(String name, LocalDate date, LocalDate enDate, String startTime, String endTime, 
-                 String location, String description, List<Organizer> organizers,
-                 String color, String showMe, String visibility, File attachedFile, File eventImage, long durationDays) {
-    this.name = name;
-    this.date = date;
-    this.endDate = enDate;  // fixed
-    this.durationDays = durationDays;
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.location = location;
-    this.description = description;
-    this.organizers = new ArrayList<>(organizers);
-    this.color = color;
-    this.showMe = showMe;
-    this.visibility = visibility;
-    this.attachedFilePath = attachedFile;
-    this.eventImagePath = eventImage;
-}
+
+        public EventData(int id, String name, LocalDate date, LocalDate enDate, String startTime, String endTime,
+                String location, String description, List<Organizer> organizers,
+                String color, String showMe, String visibility, File attachedFile, File eventImage, long durationDays) {
+            this.id = id;
+            this.name = name;
+            this.date = date;
+            this.endDate = enDate; // fixed
+            this.durationDays = durationDays;
+            this.startTime = startTime;
+            this.endTime = endTime;
+            this.location = location;
+            this.description = description;
+            this.organizers = new ArrayList<>(organizers);
+            this.color = color;
+            this.showMe = showMe;
+            this.visibility = visibility;
+            this.attachedFilePath = attachedFile;
+            this.eventImagePath = eventImage;
+        }
 
     }
 
-    //new
+    // new
     // Path to store data
 
+    // Load all events from file
+    @SuppressWarnings("unchecked")
 
-// Load all events from file
-@SuppressWarnings("unchecked")
-
-
-private Connection getConnection() throws Exception {
-    String url = "jdbc:mysql://ununqd8usvy0wouy:GmDEehgTBjzyuPRuA8i8@b1gtvncwynmgz6qozokc-mysql.services.clever-cloud.com:3306/b1gtvncwynmgz6qozokc";
-    String user = "ununqd8usvy0wouy" ;
-    String password = "GmDEehgTBjzyuPRuA8i8";
-    Class.forName("com.mysql.cj.jdbc.Driver");
-    return DriverManager.getConnection(url, user, password);
-}
-
-private boolean isValidOrganizer(String username, int registrationCode) {
-    // Allow the logged-in organizer
-    if (Session.getUsername() != null &&
-        Session.getUsername().equalsIgnoreCase(username) &&
-        Session.getOrganizerId() == registrationCode) {
-        return true;
+    private Connection getConnection() throws Exception {
+        String url = "jdbc:mysql://ununqd8usvy0wouy:GmDEehgTBjzyuPRuA8i8@b1gtvncwynmgz6qozokc-mysql.services.clever-cloud.com:3306/b1gtvncwynmgz6qozokc";
+        String user = "ununqd8usvy0wouy";
+        String password = "GmDEehgTBjzyuPRuA8i8";
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        return DriverManager.getConnection(url, user, password);
     }
 
-    // Otherwise, check database
-    String sql = "SELECT ID FROM users WHERE Username = ? AND ID = ?";
-    try (Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setString(1, username);
-        ps.setInt(2, registrationCode);
-        ResultSet rs = ps.executeQuery();
-        return rs.next();
-    } catch (Exception e) {
-        e.printStackTrace();
-        return false;
-    }
-}
+    boolean isValidOrganizer(String username, int registrationCode) {
+        // Allow the logged-in organizer
+        if (Session.getUsername() != null &&
+                Session.getUsername().equalsIgnoreCase(username) &&
+                Session.getOrganizerId() == registrationCode) {
+            return true;
+        }
 
-private LocalDate calculateEndDate(LocalDate startDate, String endsAfter) {
-    if (startDate == null || endsAfter == null) return startDate;
-
-    int days;
-    switch (endsAfter) {
-        case "Same Day" -> days = 1;
-        case "1 Day" -> days = 2;
-        case "2 Days" -> days = 3;
-        case "3 Days" -> days = 4;
-        case "1 Week" -> days = 8;
-        case "2 Weeks" -> days = 15;
-        default -> days = 1; // Custom or unrecognized
+        // Otherwise, check database
+        String sql = "SELECT ID FROM users WHERE Username = ? AND ID = ?";
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setInt(2, registrationCode);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    return startDate.plusDays(days - 1); // subtract 1 because start day counts
-}
+    private LocalDate calculateEndDate(LocalDate startDate, String endsAfter) {
+        if (startDate == null || endsAfter == null)
+            return startDate;
 
-private long calculateDurationDays(LocalDate startDate, LocalDate endDate) {
-    if (startDate == null || endDate == null) return 1;
-    return ChronoUnit.DAYS.between(startDate, endDate) + 1; // inclusive
-}
+        int days;
+        switch (endsAfter) {
+            case "Same Day" -> days = 1;
+            case "1 Day" -> days = 2;
+            case "2 Days" -> days = 3;
+            case "3 Days" -> days = 4;
+            case "1 Week" -> days = 8;
+            case "2 Weeks" -> days = 15;
+            default -> days = 1; // Custom or unrecognized
+        }
 
-private void insertEventIntoDatabase(EventData event) {
-    String sql = """
-        INSERT INTO events (
-            event_name, place_name, start_date, end_date,
-            start_time, end_time, Description, Color,
-            ShowMe, Visibility, AttachedFilePath, EventImagePath,
-            organizer_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """;
+        return startDate.plusDays(days - 1); // subtract 1 because start day counts
+    }
 
-    try (Connection conn = getConnection()) {
-        // Start transaction
-        conn.setAutoCommit(false);
+    private long calculateDurationDays(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null)
+            return 1;
+        return ChronoUnit.DAYS.between(startDate, endDate) + 1; // inclusive
+    }
 
-        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+    private void insertEventIntoDatabase(EventData event) {
+        String sql = """
+                    INSERT INTO events (
+                        event_name, place_name, start_date, end_date,
+                        start_time, end_time, Description, Color,
+                        ShowMe, Visibility, AttachedFilePath, EventImagePath,
+                        organizer_id
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """;
 
-            ps.setString(1, event.name);
-            ps.setString(2, event.location);
-            ps.setDate(3, java.sql.Date.valueOf(event.date));
-            ps.setDate(4, java.sql.Date.valueOf(event.endDate));
-            ps.setString(5, event.startTime);
-            ps.setString(6, event.endTime);
-            ps.setString(7, event.description);
-            ps.setString(8, event.color);
-            ps.setString(9, event.showMe);
-            ps.setString(10, event.visibility);
-            ps.setString(11, event.attachedFilePath != null ? event.attachedFilePath.getAbsolutePath() : null);
-            ps.setString(12, event.eventImagePath != null ? event.eventImagePath.getAbsolutePath() : null);
-            ps.setInt(13, event.organizers.get(0).registrationCode); // main organizer
+        try (Connection conn = getConnection()) {
+            // Start transaction
+            conn.setAutoCommit(false);
 
-            ps.executeUpdate();
+            try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            // Get generated event_id
-            ResultSet keys = ps.getGeneratedKeys();
-            int eventId = 0;
-            if (keys.next()) {
-                eventId = keys.getInt(1);
+                ps.setString(1, event.name);
+                ps.setString(2, event.location);
+                ps.setDate(3, java.sql.Date.valueOf(event.date));
+                ps.setDate(4, java.sql.Date.valueOf(event.endDate));
+                ps.setString(5, event.startTime);
+                ps.setString(6, event.endTime);
+                ps.setString(7, event.description);
+                ps.setString(8, event.color);
+                ps.setString(9, event.showMe);
+                ps.setString(10, event.visibility);
+                ps.setString(11, event.attachedFilePath != null ? event.attachedFilePath.getAbsolutePath() : null);
+                ps.setString(12, event.eventImagePath != null ? event.eventImagePath.getAbsolutePath() : null);
+                ps.setInt(13, event.organizers.get(0).registrationCode); // main organizer
+
+                ps.executeUpdate();
+
+                // Get generated event_id
+                ResultSet keys = ps.getGeneratedKeys();
+                int eventId = 0;
+                if (keys.next()) {
+                    eventId = keys.getInt(1);
+                }
+
+                // Insert all organizers (main + sub-organizers)
+                if (!event.organizers.isEmpty()) {
+                    insertOrganizers(conn, eventId, event.organizers);
+                }
+
+                conn.commit();
+                System.out.println("✅ Event and organizers saved successfully to MySQL!");
+
+            } catch (Exception e) {
+                conn.rollback(); // rollback on failure
+                e.printStackTrace();
+                showAlert("Database Error", "Failed to save event: " + e.getMessage(), Alert.AlertType.ERROR);
+            } finally {
+                conn.setAutoCommit(true);
             }
-
-            // Insert all organizers (main + sub-organizers)
-            if (!event.organizers.isEmpty()) {
-                insertOrganizers(conn, eventId, event.organizers);
-            }
-
-            conn.commit();
-            System.out.println("✅ Event and organizers saved successfully to MySQL!");
 
         } catch (Exception e) {
-            conn.rollback(); // rollback on failure
             e.printStackTrace();
-            showAlert("Database Error", "Failed to save event: " + e.getMessage(), Alert.AlertType.ERROR);
-        } finally {
-            conn.setAutoCommit(true);
+            showAlert("Database Error", "Failed to save event connection: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<EventData> loadEventsFromDB() {
+        List<EventData> events = new ArrayList<>();
+
+        String url = "jdbc:mysql://ununqd8usvy0wouy:GmDEehgTBjzyuPRuA8i8@b1gtvncwynmgz6qozokc-mysql.services.clever-cloud.com:3306/b1gtvncwynmgz6qozokc";
+        String user = "ununqd8usvy0wouy";
+        String password = "GmDEehgTBjzyuPRuA8i8";
+
+        String sql = "SELECT event_id, event_name, place_name, start_date, end_date, start_time, end_time, Description, Color, ShowMe, Visibility, AttachedFilePath, EventImagePath FROM events";
+
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                int eventId = rs.getInt("event_id");
+                String name = rs.getString("event_name");
+                String location = rs.getString("place_name");
+                LocalDate startDate = rs.getDate("start_date").toLocalDate();
+                LocalDate endDate = rs.getDate("end_date").toLocalDate();
+                String startTime = rs.getString("start_time");
+                String endTime = rs.getString("end_time");
+                String description = rs.getString("Description");
+                String color = rs.getString("Color");
+                String showMe = rs.getString("ShowMe");
+                String visibility = rs.getString("Visibility");
+                String attachedFilePath = rs.getString("AttachedFilePath");
+                String eventImagePath = rs.getString("EventImagePath");
+
+                long durationDays = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+
+                // Fetch organizers using event_id
+                List<Organizer> organizers = new ArrayList<>();
+                try (PreparedStatement orgPs = conn.prepareStatement(
+                        "SELECT organizer_name, organizer_id FROM organizers WHERE event_id = ?")) {
+                    orgPs.setInt(1, eventId);
+                    ResultSet orgRs = orgPs.executeQuery();
+                    while (orgRs.next()) {
+                        organizers.add(new Organizer(orgRs.getString("organizer_name"), orgRs.getInt("organizer_id")));
+                    }
+                }
+
+                events.add(new EventData(
+                        eventId,
+                        name,
+                        startDate,
+                        endDate,
+                        startTime,
+                        endTime,
+                        location,
+                        description,
+                        organizers,
+                        color,
+                        showMe,
+                        visibility,
+                        attachedFilePath != null ? new File(attachedFilePath) : null,
+                        eventImagePath != null ? new File(eventImagePath) : null,
+                        durationDays));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
-        showAlert("Database Error", "Failed to save event connection: " + e.getMessage(), Alert.AlertType.ERROR);
+        return events;
     }
-}
 
+    void insertOrganizers(Connection conn, int eventId, List<Organizer> organizers) throws SQLException {
+        String sql = "INSERT INTO organizers (event_id, organizer_name, organizer_id) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            for (Organizer org : organizers) {
+                ps.setInt(1, eventId);
+                ps.setString(2, org.name);
+                ps.setInt(3, org.registrationCode);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
 
-  @SuppressWarnings("unchecked")
-public static List<EventData> loadEventsFromDB() {
-    List<EventData> events = new ArrayList<>();
+    private boolean isPlaceBookedByOrganizer(String placeName, LocalDate startDate, LocalDate endDate,
+            String startTime, String endTime, int organizerId) {
+        String sql = """
+                    SELECT COUNT(*) FROM bookings
+                    WHERE place_name = ?
+                      AND organizer_id = ?
+                      AND start_date <= ?
+                      AND end_date >= ?
+                      AND start_time <= ?
+                      AND end_time >= ?
+                """;
 
-    String url = "jdbc:mysql://ununqd8usvy0wouy:GmDEehgTBjzyuPRuA8i8@b1gtvncwynmgz6qozokc-mysql.services.clever-cloud.com:3306/b1gtvncwynmgz6qozokc";
-    String user = "ununqd8usvy0wouy";
-    String password = "GmDEehgTBjzyuPRuA8i8";
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
-    String sql = "SELECT event_id, event_name, place_name, start_date, end_date, start_time, end_time, Description, Color, ShowMe, Visibility, AttachedFilePath, EventImagePath FROM events";
+            ps.setString(1, placeName);
+            ps.setInt(2, organizerId);
+            ps.setDate(3, java.sql.Date.valueOf(endDate));
+            ps.setDate(4, java.sql.Date.valueOf(startDate));
+            ps.setString(5, endTime); // end_time as string
+            ps.setString(6, startTime); // start_time as string
 
-    try (Connection conn = DriverManager.getConnection(url, user, password);
-         PreparedStatement ps = conn.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-
-        while (rs.next()) {
-            int eventId = rs.getInt("event_id");
-            String name = rs.getString("event_name");
-            String location = rs.getString("place_name");
-            LocalDate startDate = rs.getDate("start_date").toLocalDate();
-            LocalDate endDate = rs.getDate("end_date").toLocalDate();
-            String startTime = rs.getString("start_time");
-            String endTime = rs.getString("end_time");
-            String description = rs.getString("Description");
-            String color = rs.getString("Color");
-            String showMe = rs.getString("ShowMe");
-            String visibility = rs.getString("Visibility");
-            String attachedFilePath = rs.getString("AttachedFilePath");
-            String eventImagePath = rs.getString("EventImagePath");
-
-            long durationDays = ChronoUnit.DAYS.between(startDate, endDate) + 1;
-
-            // Fetch organizers using event_id
-            List<Organizer> organizers = new ArrayList<>();
-            try (PreparedStatement orgPs = conn.prepareStatement(
-                    "SELECT organizer_name, organizer_id FROM organizers WHERE event_id = ?")) {
-                orgPs.setInt(1, eventId);
-                ResultSet orgRs = orgPs.executeQuery();
-                while (orgRs.next()) {
-                    organizers.add(new Organizer(orgRs.getString("organizer_name"), orgRs.getInt("organizer_id")));
-                }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
             }
 
-            events.add(new EventData(
-                    name,
-                    startDate,
-                    endDate,
-                    startTime,
-                    endTime,
-                    location,
-                    description,
-                    organizers,
-                    color,
-                    showMe,
-                    visibility,
-                    attachedFilePath != null ? new File(attachedFilePath) : null,
-                    eventImagePath != null ? new File(eventImagePath) : null,
-                    durationDays
-            ));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+
+        return false;
     }
 
-    return events;
-}
+    public static List<EventData> loadUserEvents(String username) {
+        int organizerId = Session.getOrganizerId(); // get logged-in organizer ID
+        return loadUserEvents(username, organizerId);
+    }
 
+    public static List<EventData> loadUserEvents(String username, int organizerId) {
+        List<EventData> events = new ArrayList<>();
 
-private void insertOrganizers(Connection conn, int eventId, List<Organizer> organizers) throws SQLException {
-    String sql = "INSERT INTO organizers (event_id, organizer_name, organizer_id) VALUES (?, ?, ?)";
-    try (PreparedStatement ps = conn.prepareStatement(sql)) {
-        for (Organizer org : organizers) {
+        String sql = """
+                    SELECT e.event_id, e.event_name, e.place_name, e.start_date, e.end_date,
+                           e.start_time, e.end_time, e.Description, e.Color, e.ShowMe,
+                           e.Visibility, e.AttachedFilePath, e.EventImagePath
+                    FROM events e
+                    JOIN organizers o ON e.event_id = o.event_id
+                    WHERE o.organizer_name = ? AND o.organizer_id = ?
+                    ORDER BY e.start_date ASC
+                """;
+
+        try (Connection conn = DriverManager.getConnection(
+                "jdbc:mysql://ununqd8usvy0wouy:GmDEehgTBjzyuPRuA8i8@b1gtvncwynmgz6qozokc-mysql.services.clever-cloud.com:3306/b1gtvncwynmgz6qozokc",
+                "ununqd8usvy0wouy", "GmDEehgTBjzyuPRuA8i8");
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ps.setInt(2, organizerId);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int eventId = rs.getInt("event_id");
+                String name = rs.getString("event_name");
+                String location = rs.getString("place_name");
+                LocalDate startDate = rs.getDate("start_date").toLocalDate();
+                LocalDate endDate = rs.getDate("end_date").toLocalDate();
+                String startTime = rs.getString("start_time");
+                String endTime = rs.getString("end_time");
+                String description = rs.getString("Description");
+                String color = rs.getString("Color");
+                String showMe = rs.getString("ShowMe");
+                String visibility = rs.getString("Visibility");
+                String attachedFilePath = rs.getString("AttachedFilePath");
+                String eventImagePath = rs.getString("EventImagePath");
+                long durationDays = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+
+                // Load all organizers for this event
+                List<Organizer> organizers = new ArrayList<>();
+                try (PreparedStatement orgPs = conn.prepareStatement(
+                        "SELECT organizer_name, organizer_id FROM organizers WHERE event_id = ?")) {
+                    orgPs.setInt(1, eventId);
+                    ResultSet orgRs = orgPs.executeQuery();
+                    while (orgRs.next()) {
+                        organizers.add(new Organizer(orgRs.getString("organizer_name"),
+                                orgRs.getInt("organizer_id")));
+                    }
+                }
+
+                events.add(new EventData(
+                        eventId, name, startDate, endDate, startTime, endTime,
+                        location, description, organizers,
+                        color, showMe, visibility,
+                        attachedFilePath != null ? new File(attachedFilePath) : null,
+                        eventImagePath != null ? new File(eventImagePath) : null,
+                        durationDays));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return events;
+    }
+
+    public static boolean deleteEvent(int eventId) {
+        String sql = "DELETE FROM events WHERE event_id = ?";
+
+        try (Connection conn = DriverManager.getConnection(
+                "jdbc:mysql://ununqd8usvy0wouy:GmDEehgTBjzyuPRuA8i8@b1gtvncwynmgz6qozokc-mysql.services.clever-cloud.com:3306/b1gtvncwynmgz6qozokc",
+                "ununqd8usvy0wouy", "GmDEehgTBjzyuPRuA8i8");
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, eventId);
-            ps.setString(2, org.name);
-            ps.setInt(3, org.registrationCode);
-            ps.addBatch();
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
-        ps.executeBatch();
-    }
-}
-
-
-private boolean isPlaceBookedByOrganizer(String placeName, LocalDate startDate, LocalDate endDate,
-                                         String startTime, String endTime, int organizerId) {
-    String sql = """
-        SELECT COUNT(*) FROM bookings
-        WHERE place_name = ?
-          AND organizer_id = ?
-          AND start_date <= ?
-          AND end_date >= ?
-          AND start_time <= ?
-          AND end_time >= ?
-    """;
-
-    try (Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-
-        ps.setString(1, placeName);
-        ps.setInt(2, organizerId);
-        ps.setDate(3, java.sql.Date.valueOf(endDate));
-        ps.setDate(4, java.sql.Date.valueOf(startDate));
-        ps.setString(5, endTime);   // end_time as string
-        ps.setString(6, startTime); // start_time as string
-
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            return rs.getInt(1) > 0;
-        }
-
-    } catch (Exception e) {
-        e.printStackTrace();
     }
 
-    return false;
 }
-
-
-
-
-
-
-}
-

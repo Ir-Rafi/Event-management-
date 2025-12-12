@@ -7,13 +7,18 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+
+import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
 
+
 public class AdvancedTodoListApp extends Application {
 
+    private static final String DATA_FILE = "tasks_data.txt";
+    
     private ObservableList<Task> allTasks = FXCollections.observableArrayList();
     private ObservableList<String> categories = FXCollections.observableArrayList("Work", "Personal", "Shopping");
     private ListView<Task> taskListView;
@@ -21,12 +26,15 @@ public class AdvancedTodoListApp extends Application {
     private TextField searchField;
     private Label totalLabel, completedLabel, pendingLabel;
 
-    private Scene organizerScene; // store main organizer scene
+    private Scene organizerScene;
 
-    public AdvancedTodoListApp() {}
+    public AdvancedTodoListApp() {
+        loadTasksFromFile();
+    }
 
     public AdvancedTodoListApp(Scene organizerScene) {
         this.organizerScene = organizerScene;
+        loadTasksFromFile();
     }
 
     @Override
@@ -40,12 +48,14 @@ public class AdvancedTodoListApp extends Application {
         VBox mainContent = createMainContent();
         root.setCenter(mainContent);
 
-        Scene scene = new Scene(root, 900, 700);
+        Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("todoListStyle.css").toExternalForm());
 
         stage.setTitle("Advanced To-Do List");
         stage.setScene(scene);
-        stage.setMaximized(true);
+        stage.setFullScreen(true);
+        stage.setFullScreenExitHint("");
+
         stage.show();
     }
 
@@ -64,14 +74,14 @@ public class AdvancedTodoListApp extends Application {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // 🧭 BACK BUTTON
         Button backBtn = new Button("← Back");
         backBtn.getStyleClass().add("btn-primary");
         backBtn.setOnAction(e -> {
             if (organizerScene != null) {
                 stage.setScene(organizerScene);
+                stage.setFullScreen(true);
+                stage.setFullScreenExitHint("");
             } else {
-                // fallback: show an alert
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Back Navigation");
                 alert.setHeaderText("Organizer scene not available!");
@@ -176,6 +186,7 @@ public class AdvancedTodoListApp extends Application {
         Task task = new Task(text.trim());
         allTasks.add(0, task);
         input.clear();
+        saveTasksToFile();
         updateStats();
     }
 
@@ -187,6 +198,7 @@ public class AdvancedTodoListApp extends Application {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             allTasks.remove(task);
+            saveTasksToFile();
             updateStats();
         }
     }
@@ -266,6 +278,7 @@ public class AdvancedTodoListApp extends Application {
 
         Optional<Task> result = dialog.showAndWait();
         if (result.isPresent()) {
+            saveTasksToFile();
             taskListView.refresh();
             updateCategoryCombo();
             updateStats();
@@ -326,6 +339,80 @@ public class AdvancedTodoListApp extends Application {
         }
     }
 
+    // FILE PERSISTENCE METHODS
+    private void saveTasksToFile() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(DATA_FILE))) {
+            for (Task task : allTasks) {
+                String categories = task.getCategories().isEmpty() ? "" : String.join(",", task.getCategories());
+                String line = task.getText() + "|" + 
+                              task.isCompleted() + "|" + 
+                              task.getPriority() + "|" + 
+                              (task.getDueDate() == null ? "" : task.getDueDate()) + "|" + 
+                              categories;
+                writer.write(line);
+                writer.newLine();
+            }
+            writer.flush();
+            System.out.println("Tasks saved successfully. Total tasks: " + allTasks.size());
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("Error saving tasks", "Could not save tasks to file: " + e.getMessage());
+        }
+    }
+
+    private void loadTasksFromFile() {
+        File file = new File(DATA_FILE);
+        if (!file.exists()) {
+            System.out.println("No previous tasks file found. Starting fresh.");
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(DATA_FILE))) {
+            String line;
+            int count = 0;
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+                
+                String[] parts = line.split("\\|", -1); // -1 to keep empty strings
+                if (parts.length >= 4) {
+                    Task task = new Task(parts[0]);
+                    task.setCompleted(Boolean.parseBoolean(parts[1]));
+                    task.setPriority(parts[2]);
+                    task.setDueDate(parts[3]);
+                    
+                    if (parts.length == 5 && !parts[4].isEmpty()) {
+                        String[] cats = parts[4].split(",");
+                        ArrayList<String> categoryList = new ArrayList<>();
+                        for (String cat : cats) {
+                            if (!cat.trim().isEmpty()) {
+                                categoryList.add(cat.trim());
+                                if (!categories.contains(cat.trim())) {
+                                    categories.add(cat.trim());
+                                }
+                            }
+                        }
+                        task.setCategories(categoryList);
+                    }
+                    
+                    allTasks.add(task);
+                    count++;
+                }
+            }
+            System.out.println("Loaded " + count + " tasks from file.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("Error loading tasks", "Could not load tasks from file: " + e.getMessage());
+        }
+    }
+
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
     class TaskCell extends ListCell<Task> {
         @Override
         protected void updateItem(Task task, boolean empty) {
@@ -345,6 +432,7 @@ public class AdvancedTodoListApp extends Application {
             checkBox.setSelected(task.isCompleted());
             checkBox.setOnAction(e -> {
                 task.setCompleted(checkBox.isSelected());
+                saveTasksToFile();
                 updateStats();
                 updateItem(task, false);
             });

@@ -32,55 +32,96 @@ public class ChatController implements Initializable {
     private ScrollPane sp_main;
 
     private Server server;
+    private String serverName;
+    private String loggedInUserName;
+    private Thread serverThread;
+
+    public void setLoggedInUsername(String username) {
+        this.loggedInUserName = username;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        vbox_messages.heightProperty().addListener((obs, oldVal, newVal) -> sp_main.setVvalue(1.0));
+        button_send.setOnAction(this::sendMessage);
+    }
+
+    public void startServer() {
+    serverThread = new Thread(() -> {
         try {
-            server = new Server(new ServerSocket(1234));
+            System.out.println("Starting server on port 1234...");
+            
+            ServerSocket serverSocket = new ServerSocket(
+                1234,
+                50,
+                java.net.InetAddress.getByName("0.0.0.0")
+            );
+            
+            System.out.println("Server started successfully. Waiting for client...");
+            
+            // ✅ Pass vbox_messages to Server constructor
+            server = new Server(serverSocket, vbox_messages);
+            
+            Platform.runLater(() -> {
+                addLabel("Server logged in as: " + loggedInUserName, vbox_messages);
+                addLabel("Server started. Waiting for client connection...", vbox_messages);
+            });
+            
+            server.receiveMessageFromClient(vbox_messages);
+            
         } catch (IOException e) {
+            System.out.println("Error starting server: " + e.getMessage());
             e.printStackTrace();
-            System.out.println("Error creating server");
+            
+            Platform.runLater(() -> {
+                addLabel("ERROR: Failed to start server - " + e.getMessage(), vbox_messages);
+            });
+        } catch (Exception e) {
+            System.out.println("Unexpected error in server: " + e.getMessage());
+            e.printStackTrace();
+            
+            Platform.runLater(() -> {
+                addLabel("ERROR: Unexpected error - " + e.getMessage(), vbox_messages);
+            });
+        }
+    });
+    
+    serverThread.setDaemon(true);
+    serverThread.setName("ServerThread-" + loggedInUserName);
+    serverThread.start();
+}
+
+    private void sendMessage(ActionEvent event) {
+        String msg = tf_message.getText().trim();
+        if (msg.isEmpty()) {
+            System.out.println("Message is empty");
+            return;
+        }
+        
+        if (server == null) {
+            Platform.runLater(() -> {
+                addLabel("ERROR: Server not initialized", vbox_messages);
+            });
+            return;
         }
 
-        // Automatically scroll to the bottom when new messages arrive
-        vbox_messages.heightProperty().addListener((observableValue, oldValue, newValue) -> {
-            sp_main.setVvalue(1.0);
-        });
+        // Create message bubble (right-aligned for server messages)
+        HBox hbox = new HBox();
+        hbox.setAlignment(Pos.CENTER_RIGHT);
+        hbox.setPadding(new Insets(5, 5, 5, 18));
 
-        server.receiveMessageFromClient(vbox_messages);
+        Text text = new Text(msg);
+        TextFlow tf = new TextFlow(text);
+        tf.setStyle("-fx-background-color: rgb(15,125,242); -fx-background-radius: 20px;");
+        tf.setPadding(new Insets(5, 10, 5, 10));
+        text.setFill(Color.WHITE);
 
-        button_send.setOnAction((ActionEvent event) -> {
-            String messageToSend = tf_message.getText();
-            if (!messageToSend.isEmpty()) {
+        hbox.getChildren().add(tf);
+        vbox_messages.getChildren().add(hbox);
 
-                // Message container (right-aligned)
-                HBox hbox = new HBox();
-                hbox.setAlignment(Pos.CENTER_RIGHT);
-                hbox.setPadding(new Insets(5, 5, 5, 18));
-
-                // Message text
-                Text text = new Text(messageToSend);
-                TextFlow textFlow = new TextFlow(text);
-
-                // ✅ FIXED: Added missing semicolon between properties
-                textFlow.setStyle(
-                        "-fx-background-color: rgb(15,125,242); " +
-                                "-fx-background-radius: 20px;"
-                );
-
-                textFlow.setPadding(new Insets(5, 10, 5, 10));
-                text.setFill(Color.color(0.934, 0.945, 0.996));
-
-                hbox.getChildren().add(textFlow);
-                vbox_messages.getChildren().add(hbox);
-
-                // Send to client
-                server.sendMessageToClient(messageToSend);
-
-                // Clear input
-                tf_message.clear();
-            }
-        });
+        // Send to client
+        server.sendMessageToClient(msg);
+        tf_message.clear();
     }
 
     // Message from client (left-aligned)
@@ -92,15 +133,24 @@ public class ChatController implements Initializable {
         Text text = new Text(messageFromClient);
         TextFlow textFlow = new TextFlow(text);
 
-        // ✅ FIXED: Added missing semicolon
         textFlow.setStyle(
                 "-fx-background-color: rgb(253,255,235); " +
-                        "-fx-background-radius: 20px;"
+                "-fx-background-radius: 20px;"
         );
 
         textFlow.setPadding(new Insets(5, 10, 5, 10));
         hbox.getChildren().add(textFlow);
 
         Platform.runLater(() -> vbox.getChildren().add(hbox));
+    }
+    
+    // Optional: Method to stop server gracefully
+    public void stopServer() {
+        if (server != null) {
+            server.closeEverything(null, null, null);
+        }
+        if (serverThread != null && serverThread.isAlive()) {
+            serverThread.interrupt();
+        }
     }
 }
